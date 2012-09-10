@@ -1,0 +1,45 @@
+\name{gauss_model}
+\alias{gauss_model}
+\title{Gaussian model of functional data}
+\usage{
+  gauss_model(fn, time, qn, gam, n = 1,
+    sort_samples = FALSE)
+}
+\arguments{
+  \item{fn}{matrix (\eqn{M} x \eqn{N}) of \eqn{M} aligned
+  functions with \eqn{N} samples}
+
+  \item{time}{vector of size \eqn{N} describing the sample
+  points}
+
+  \item{qn}{matrix (\eqn{M} x \eqn{N}) of \eqn{M} aligned
+  srvfs}
+
+  \item{gam}{warping functions}
+
+  \item{n}{number of random samples (n = 1)}
+
+  \item{sort_samples}{sort samples (default = F)}
+}
+\value{
+  Returns a list containing \item{fs}{random aligned
+  samples} \item{gams}{random warping function samples}
+}
+\description{
+  This function models the functional data using a Gaussian
+  model extracted from the principal components of the
+  srvfs
+}
+\examples{
+data("simu_data")
+out = time_warping(simu_data$f,simu_data$time)
+out1 = gauss_model(out$fn,simu_data$time,out$qn,out$gam,n = 10)
+}
+\references{
+  Tucker, J. D., Wu, W., Srivastava, A., May 2012.
+  Generative Models for Function Data using Phase and
+  Amplitude Separation, submitted to Computational
+  Statistics and Data Analysis.
+}
+\keyword{pca}
+
