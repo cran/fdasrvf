@@ -10,8 +10,10 @@
 #' @param smooth_data smooth data using box filter (default = F)
 #' @param sparam number of times to apply box filter (default = 25)
 #' @param parallel enable parallel mode using \code{\link{foreach}} and 
-#'   \code{\link{doMC}} pacakge 
-#' @param cores set number of cores to use with \code{\link{doMC}} (default = 8)
+#'   \code{doMC} pacakge if on windows or \code{doSNOW} if on 
+#'   windows
+#' @param cores set number of cores to use with \code{doMC} or
+#' \code{doSNOW}(default = 2)
 #' @return Returns a list containing \item{f0}{original functions}
 #' \item{fn}{aligned functions}
 #' \item{qn}{aligned srvfs}
@@ -38,8 +40,13 @@ align_fPCA <- function(f, time, num_comp = 3, showplot = T, smooth_data = FALSE,
 	library(numDeriv)
 	library(foreach)
 	if (parallel){
-		library(doMC)
-		registerDoMC(cores=cores)
+		if(.Platform$OS.type == "unix") {
+			library(doMC)
+			registerDoMC(cores=cores)
+		} else {
+			library(doSNOW)
+			registerDoSNOW(makeCluster(cores, type = "SOCK"))
+		}
 	} else
 	{
 		registerDoSEQ()
@@ -83,7 +90,7 @@ align_fPCA <- function(f, time, num_comp = 3, showplot = T, smooth_data = FALSE,
 	alpha_i = matrix(0,num_comp,N)
 	for (ii in 1:num_comp){
 		for (jj in 1:N){
-			alpha_i[ii,jj] = simpson_s(time,qhat_cent[,jj]*U[,ii])
+			alpha_i[ii,jj] = simpson(time,qhat_cent[,jj]*U[,ii])
 		}
 	}
 	
@@ -92,7 +99,7 @@ align_fPCA <- function(f, time, num_comp = 3, showplot = T, smooth_data = FALSE,
 		mq = mq/pvecnorm(mq,2)
 		for (ii in 1:N){
 			if (sum(tmp[,ii]) != 0)
-			tmp[,ii] = tmp[,ii]/pvecnorm(tmp[,ii],2)
+				tmp[,ii] = tmp[,ii]/pvecnorm(tmp[,ii],2)
 		}
 	}
 	qhat = matrix(mq,M,N) + tmp
@@ -144,7 +151,7 @@ align_fPCA <- function(f, time, num_comp = 3, showplot = T, smooth_data = FALSE,
 		alpha_i = matrix(0,num_comp,N)
 		for (ii in 1:num_comp){
 			for (jj in 1:N){
-				alpha_i[ii,jj] = simpson_s(time,qhat_cent[,jj]*U[,ii])
+				alpha_i[ii,jj] = simpson(time,qhat_cent[,jj]*U[,ii])
 			}
 		}
 		
