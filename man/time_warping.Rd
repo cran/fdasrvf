@@ -4,7 +4,7 @@
 \usage{
   time_warping(f, time, lambda = 0, showplot = TRUE,
     smooth_data = FALSE, sparam = 25, parallel = FALSE,
-    cores = 8)
+    cores = 2)
 }
 \arguments{
   \item{f}{matrix (\eqn{M} x \eqn{N}) of \eqn{M} functions
@@ -24,16 +24,20 @@
   (default = 25)}
 
   \item{parallel}{enable parallel mode using
-  \code{\link{foreach}} and \code{\link{doMC}} pacakge}
+  \code{\link{foreach}} and \code{doMC} pacakge if on
+  windows or \code{doSNOW} if on windows}
 
-  \item{cores}{set number of cores to use with
-  \code{\link{doMC}} (default = 8)}
+  \item{cores}{set number of cores to use with \code{doMC}
+  or \code{doSNOW}(default = 2)}
 }
 \value{
   Returns a list containing \item{f0}{original functions}
   \item{fn}{aligned functions} \item{qn}{aligned srvfs}
   \item{q0}{original srvfs} \item{fmean}{function mean}
   \item{mqn}{srvf mean} \item{gam}{warping functions}
+  \item{orig.var}{Original Variance of Functions}
+  \item{amp.var}{Amplitude Variance} \item{phase.var}{Phase
+  Variance}
 }
 \description{
   This function aligns a collection of functions using the
