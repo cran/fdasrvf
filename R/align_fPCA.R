@@ -10,7 +10,7 @@
 #' @param smooth_data smooth data using box filter (default = F)
 #' @param sparam number of times to apply box filter (default = 25)
 #' @param parallel enable parallel mode using \code{\link{foreach}} and 
-#'   \code{doMC} pacakge if on windows or \code{doSNOW} if on 
+#'   \code{doMC} pacakge if on linux or mac or \code{doSNOW} if on 
 #'   windows
 #' @param cores set number of cores to use with \code{doMC} or
 #' \code{doSNOW}(default = 2)
@@ -73,8 +73,9 @@ align_fPCA <- function(f, time, num_comp = 3, showplot = T, smooth_data = FALSE,
 	}
 	
 	# Compute q-function of the plot
-	fy = gradient(f,binsize)
-	q = fy/sqrt(abs(fy)+eps)
+	tmp = gradient.spline(f,binsize)
+	f = tmp$f
+	q = tmp$g/sqrt(abs(tmp$g)+eps)
 	
 	# PCA Step
 	mnq = rowMeans(q)
@@ -136,7 +137,7 @@ align_fPCA <- function(f, time, num_comp = 3, showplot = T, smooth_data = FALSE,
 		for (k in 1:N){
 			gam_k = as.vector(gam[,k,r-1])
 			f_temp[,k] = approx(time,f[,k,r-1],xout=(time[length(time)]-time[1])*gam_k + time[1])$y
-			q_temp[,k] = gradient(f_temp[,k],binsize)/sqrt(abs(gradient(f_temp[,k],binsize))+eps)
+			q_temp[,k] = f_to_srvf(f_temp[,k],time)
 		}
 		f[,,r] = f_temp
 		q[,,r] = q_temp

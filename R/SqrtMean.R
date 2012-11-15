@@ -13,9 +13,8 @@
 #'  arXiv:1103.3817v2 [math.ST].
 #' @export
 #' @examples
-#' data("simu_data")
-#' gam = time_warping(simu_data$f,simu_data$time)$gam
-#' out = SqrtMean(gam)
+#' data("simu_warp")
+#' out = SqrtMean(simu_warp$gam)
 SqrtMean <- function(gam){
 	TT = nrow(gam)
 	n = ncol(gam)
@@ -30,7 +29,7 @@ SqrtMean <- function(gam){
 	t = 1
 	vec = matrix(0,TT-1,n)
 	lvm = rep(0,5)
-	for (iter in 1:5){
+	for (iter in 1:3){
 		for (i in 1:n){
 			v = psi[,i] - mu
 			len = acos(sum(mu*psi[,i])/TT)
