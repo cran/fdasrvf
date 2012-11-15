@@ -140,6 +140,27 @@ gradient <- function(f,binsize){
 	return(g)
 }
 
+gradient.spline <- function(f,binsize){
+	n = nrow(f)
+	if (is.null(n)){
+		N = 1
+		tmp.spline = smooth.spline(f)
+		f.out = tmp.spline$y
+		g = predict(tmp.spline,deriv=1)$y/binsize
+	}else{
+		N = ncol(f)
+		f.out = matrix(0,nrow(f),ncol(f))
+		g = matrix(0,nrow(f),ncol(f))
+		for (jj in 1:N){
+			tmp.spline = smooth.spline(f[,jj])
+			f.out[,jj] = tmp.spline$y
+			g[,jj] = predict(tmp.spline,deriv=1)$y/binsize
+		}
+	}
+	
+	return(list(g=g, f=f.out))
+}
+
 SqrtMeanInverse <- function(gam){
 	n = nrow(gam)
 	T1 = ncol(gam)

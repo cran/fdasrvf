@@ -3,32 +3,33 @@
 #' This function calculates vertical functional principal component analysis
 #' on aligned data
 #'
-#' @param vec matrix (\eqn{M} x \eqn{N}) of \eqn{M} of shooting vectors 
-#' calculated using \code{\link{SqrtMean}}
-#' @param mu mean of warping functions
+#' @param gam matrix (\eqn{M} x \eqn{N}) of \eqn{M} of warping functions
 #' @param no number of prinicpal components to extract
 #' @param showplot show plots of prinipal directions (default = T)
 #' @return Returns a list containing \item{gam_pca}{warping functions principal directions}
 #' \item{psi_pca}{srvf principal directions}
 #' \item{latent}{latent values}
 #' \item{U}{eigenvectors}
+#' \item{vec}{shooting vectors}
+#' \item{mu}{Karcher Mean}
 #' @keywords srvf alignment
 #' @references Tucker, J. D., Wu, W., Srivastava, A.,
 #'  May 2012. Generative Models for Function Data using Phase and Amplitude Separation, 
 #'  submitted to Computational Statistics and Data Analysis.
 #' @export
 #' @examples
-#' data("simu_data")
-#' gam = time_warping(simu_data$f,simu_data$time)$gam
-#' out = SqrtMean(gam)
-#' hfpca = horizFPCA(out$vec,out$mu,no = 3)
-horizFPCA <- function(vec,mu,no,showplot = TRUE){
+#' data("simu_warp")
+#' hfpca = horizFPCA(simu_warp$gam,no = 3)
+horizFPCA <- function(gam,no,showplot = TRUE){
+	tmp = SqrtMean(gam)
+	vec = tmp$vec
+	mu = tmp$mu
 	# Parameters
 	tau = 1:5 # -2, -1, 0, 1, 2 std from the mean
 	no_pca = 1:no
 	
 	# TFPCA
-	K = cov_samp(t(vec)) #out$sigma
+	K = cov(t(vec)) #out$sigma
 	
 	out = svd(K)
 	s = out$d
@@ -60,6 +61,8 @@ horizFPCA <- function(vec,mu,no,showplot = TRUE){
 	hfpca$psi_pca = psi_pca
 	hfpca$latent = s
 	hfpca$U = U
+	hfpca$vec = vec
+	hfpca$mu = mu
 	
 	if (showplot){
 		layout(matrix(c(1,2,3), 1, 3, byrow = TRUE))
