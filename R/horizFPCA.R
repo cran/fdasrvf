@@ -14,8 +14,8 @@
 #' \item{mu}{Karcher Mean}
 #' @keywords srvf alignment
 #' @references Tucker, J. D., Wu, W., Srivastava, A.,
-#'  May 2012. Generative Models for Function Data using Phase and Amplitude Separation, 
-#'  submitted to Computational Statistics and Data Analysis.
+#'  Generative Models for Function Data using Phase and Amplitude Separation, 
+#'  Computational Statistics and Data Analysis (2012), 10.1016/j.csda.2012.12.001. 
 #' @export
 #' @examples
 #' data("simu_warp")
@@ -66,11 +66,11 @@ horizFPCA <- function(gam,no,showplot = TRUE){
 	
 	if (showplot){
 		layout(matrix(c(1,2,3), 1, 3, byrow = TRUE))
-		matplot(seq(0,1,len=TT),t(gam_pca[,,1]),type="l")
+		matplot(seq(0,1,len=TT),t(gam_pca[,,1]),type="l",xlab = "t",ylab = "t")
 		title(main="PD 1")
-		matplot(seq(0,1,len=TT),t(gam_pca[,,2]),type="l")
+		matplot(seq(0,1,len=TT),t(gam_pca[,,2]),type="l",xlab = "t",ylab = "t")
 		title(main="PD 2")
-		matplot(seq(0,1,len=TT),t(gam_pca[,,3]),type="l")
+		matplot(seq(0,1,len=TT),t(gam_pca[,,3]),type="l",xlab = "t",ylab = "t")
 		title(main="PD 3")
 		layout(1)
 		cumm_coef = 100*cumsum(s)/sum(s)

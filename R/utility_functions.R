@@ -167,33 +167,38 @@ SqrtMeanInverse <- function(gam){
 	dt = 1/(T1-1)
 	psi = matrix(0,n,T1-1)
 	for (i in 1:n){
-		psi[i,] = sqrt(diff(gam[i,])/dt)
+		psi[i,] = sqrt(diff(gam[i,])/dt+.Machine$double.eps)
 	}
 	
 	# Find direction
-	mu = psi[1,]
+	mnpsi = colMeans(psi)
+	dqq = sqrt(colSums((t(psi) - matrix(mnpsi,ncol=n,nrow=T1-1))^2))
+	min_ind = which.min(dqq)
+	mu = psi[min_ind,]
 	tt = 1
-	maxiter = 5
+	maxiter = 20
+	eps = .Machine$double.eps
 	lvm = rep(0,1,maxiter)
 	vec = matrix(0,n,T1-1)
 	for (iter in 1:maxiter){
 		for (i in 1:n){
 			v = psi[i,] - mu
-			len = acos(sum(mu*psi[i,])*dt)
+			dot<- simpson(seq(0,1,length.out=T1-1),mu*psi[i,])
+			dot.limited<- ifelse(dot>1, 1, ifelse(dot<(-1), -1, dot))
+			len = acos(dot.limited)
 			if (len > 0.0001){
 				vec[i,] = (len/sin(len))*(psi[i,] - cos(len)*mu)
 			}else{
-				vec[i,] = rep(0,1,T1-1)
+				vec[i,] = rep(0,T1-1)
 			}	
 		}
 		vm = colMeans(vec)
 		lvm[iter] = sqrt(sum(vm*vm)*dt)
-		if (lvm[iter] > 0.0001){
-			mu = cos(tt*lvm[iter])*mu + (sin(tt*lvm[iter])/lvm[iter])*vm
+		mu = cos(tt*lvm[iter])*mu + (sin(tt*lvm[iter])/lvm[iter])*vm
+		if (lvm[iter] < 1e-6 || iter >=maxiter){
+			break
 		}
-		
 	}
-	
 	gam_mu = c(0,cumsum(mu*mu))/T1
 	gam_mu = (gam_mu - min(gam_mu))/(max(gam_mu)-min(gam_mu))
 	gamI = invertGamma(gam_mu)
@@ -203,8 +208,7 @@ SqrtMeanInverse <- function(gam){
 invertGamma <- function(gam){
 	N = length(gam)
 	x = (0:(N-1))/(N-1)
-	tmp = approx(gam,x,xout=x)
-	gamI = tmp$y
+	gamI = approx(gam,x,xout=x)$y
 	gamI[N] = 1
 	gamI = gamI/gamI[N]
 	return(gamI)
@@ -328,7 +332,6 @@ svd2 <- function (x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE)
 		if ((nNA > 0) || (nInf > 0)) {
 			msg <- paste("sum(is.na(x)) = ", nNA, "; sum(abs(x)==Inf) = ", 
 									 nInf, ".  'x stored in .svd.x.NA.Inf'", sep = "")
-			assign(".svd.x.NA.Inf", x, envir = .GlobalEnv)
 			stop(msg)
 		}
 		attr(x, "n") <- n
@@ -336,17 +339,13 @@ svd2 <- function (x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE)
 		attr(x, "LINPACK") <- LINPACK
 		.x2 <- c(".svd.LAPACK.error.matrix", ".svd.LINPACK.error.matrix")
 		.x <- .x2[1 + LINPACK]
-		assign(.x, x, envir = .GlobalEnv)
 		msg <- paste("svd failed using LINPACK = ", LINPACK, 
-								 " with n = ", n, " and p = ", p, ";  x stored in '", 
-								 .x, "'", sep = "")
+								 " with n = ", n, " and p = ", p, ";", sep = "")
 		warning(msg)
 		svd.x <- try(svd(x, nu, nv, !LINPACK))
 		if (class(svd.x) == "try-error") {
 			.xc <- .x2[1 + (!LINPACK)]
-			assign(.xc, x, envir = .GlobalEnv)
-			stop("svd also failed using LINPACK = ", !LINPACK, 
-					 ";  x stored in '", .xc, "'")
+			stop("svd also failed using LINPACK = ", !LINPACK)
 		}
 	}
 	svd.x
