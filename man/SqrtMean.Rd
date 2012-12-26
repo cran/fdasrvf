@@ -9,7 +9,8 @@
   functions}
 }
 \value{
-  Returns a list containing \item{mu}{mean function}
+  Returns a list containing \item{mu}{Karcher mean psi
+  function} \item{gam_mu}{Karcher mean warping function}
   \item{psi}{srvf of warping functions} \item{vec}{shooting
   vectors}
 }
@@ -25,6 +26,11 @@ out = SqrtMean(simu_warp$gam)
   Srivastava, A., Wu, W., Kurtek, S., Klassen, E., Marron,
   J. S., May 2011. Registration of functional data using
   fisher-rao metric, arXiv:1103.3817v2 [math.ST].
+
+  Tucker, J. D., Wu, W., Srivastava, A., Generative Models
+  for Function Data using Phase and Amplitude Separation,
+  Computational Statistics and Data Analysis (2012),
+  10.1016/j.csda.2012.12.001.
 }
 \keyword{alignment}
 \keyword{srvf}
