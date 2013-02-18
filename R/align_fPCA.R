@@ -3,23 +3,21 @@
 #' This function aligns a collection of functions while extracting pincipal 
 #' components.
 #'
-#' @param f matrix (\eqn{M} x \eqn{N}) of \eqn{M} functions with \eqn{N} samples
+#' @param f matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples
 #' @param time vector of size \eqn{N} describing the sample points
 #' @param num_comp number of principal components to extract (default = 3)
 #' @param showplot shows plots of functions (default = T)
 #' @param smooth_data smooth data using box filter (default = F)
 #' @param sparam number of times to apply box filter (default = 25)
 #' @param parallel enable parallel mode using \code{\link{foreach}} and 
-#'   \code{doMC} pacakge if on linux or mac or \code{doSNOW} if on 
-#'   windows
-#' @param cores set number of cores to use with \code{doMC} or
-#' \code{doSNOW}(default = 2)
+#'   \code{doParallel} pacakge
+#' @param cores set number of cores to use with \code{doParallel} (default = 2)
 #' @return Returns a list containing \item{f0}{original functions}
-#' \item{fn}{aligned functions}
-#' \item{qn}{aligned srvfs}
-#' \item{q0}{original srvfs}
-#' \item{mqn}{srvf mean}
-#' \item{gam}{warping functions}
+#' \item{fn}{aligned functions - matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
+#' \item{qn}{aligned srvfs - similar structure to fn}
+#' \item{q0}{original srvfs - similar structure to fn}
+#' \item{mqn}{srvf mean - vecotr of length \eqn{N}}
+#' \item{gam}{warping functions - vecotr of length \eqn{N}}
 #' \item{Dx}{cost function}
 #' \item{vfpca}{list containing} 
 #' \item{q_pca}{srvf principal directions}
@@ -40,12 +38,11 @@ align_fPCA <- function(f, time, num_comp = 3, showplot = T, smooth_data = FALSE,
 	library(numDeriv)
 	library(foreach)
 	if (parallel){
+		library(doParallel)
 		if(.Platform$OS.type == "unix") {
-			library(doMC)
-			registerDoMC(cores=cores)
+			registerDoParallel(cores=cores)
 		} else {
-			library(doSNOW)
-			registerDoSNOW(makeCluster(cores, type = "SOCK"))
+			registerDoParallel(makeCluster(cores))
 		}
 	} else
 	{
