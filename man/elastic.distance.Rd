@@ -1,31 +1,30 @@
-\name{optimum.reparam}
-\alias{optimum.reparam}
-\title{Align two functions}
+\name{elastic.distance}
+\alias{elastic.distance}
+\title{Calculates two elastic distance}
 \usage{
-optimum.reparam(Q1, T1, Q2, T2, lambda = 0)
+elastic.distance(f1, f2, time, lambda = 0)
 }
 \arguments{
-  \item{Q1}{srvf of function 1}
+  \item{f1}{sample function 1}
 
-  \item{T1}{sample points of function 1}
+  \item{f2}{sample function 2}
 
-  \item{Q2}{srvf of function 2}
-
-  \item{T2}{sample points of function 2}
+  \item{time}{sample points of functions}
 
   \item{lambda}{controls amount of warping (default = 0)}
 }
 \value{
-gam warping function
+Returns a list containing \item{Dy}{amplitude distance}
+\item{Dx}{phase distance}
 }
 \description{
-This function aligns two srvf functions using Dynamic
-Programming
+This functions calculates the distances between functions,
+\eqn{D_y} and \eqn{D_x}, where function 1 is aligned to
+function 2
 }
 \examples{
 data("simu_data")
-q = f_to_srvf(simu_data$f,simu_data$time)
-gam = optimum.reparam(q[,1],simu_data$time,q[,2],simu_data$time)
+distances = elastic.distance(simu_data$f[,1],simu_data$f[,2],simu_data$time)
 }
 \references{
 Srivastava, A., Wu, W., Kurtek, S., Klassen, E., Marron, J.
@@ -38,6 +37,6 @@ Computational Statistics and Data Analysis (2012),
 10.1016/j.csda.2012.12.001.
 }
 \keyword{alignment,}
-\keyword{pca}
+\keyword{distances}
 \keyword{srvf}
 
