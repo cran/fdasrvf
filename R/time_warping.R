@@ -39,8 +39,6 @@
 time_warping <- function(f, time, lambda = 0, method = "mean",
 												 showplot = TRUE, smooth_data = FALSE, sparam = 25, 
 												 parallel = FALSE,cores=2){
-	library(numDeriv)
-	library(foreach)
 	if (parallel){
 		library(doParallel)
 		cl = makeCluster(cores)
@@ -71,7 +69,7 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
 	}
 	
 	# Compute q-function of the functional data
-	tmp = gradient.spline(f,binsize)
+	tmp = gradient.spline(f,binsize,smooth_data)
 	f = tmp$f
 	q = tmp$g/sqrt(abs(tmp$g)+eps)
 	

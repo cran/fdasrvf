@@ -1,5 +1,6 @@
 export(SqrtMean)
 export(align_fPCA)
+export(elastic.distance)
 export(f_to_srvf)
 export(gauss_model)
 export(gradient)
