@@ -1,14 +1,20 @@
 Package: fdasrvf
-Maintainer: J. Derek Tucker <dtucker@stat.fsu.edu>
-Author: J. Derek Tucker <dtucker@stat.fsu.edu>
-Version: 1.4.2
-License: GPL-3
+Type: Package
 Title: Elastic Functional Data Analysis
-Description: A library for functional data analysis using the square root
-    velocity framework
-Depends: R (>= 2.11.0), foreach, mvtnorm, matrixcalc, numDeriv
-Suggests: doParallel
-Packaged: 2014-01-29 12:36:07 UTC; jdtucker
+Version: 1.5.1
+Date: 2015-11-15
+Author: J. Derek Tucker <jdtuck@sandia.gov>
+Maintainer: J. Derek Tucker <jdtuck@sandia.gov>
+Description: Functions to support functional data analysis using the square root velocity framework.
+License: GPL-3
+LazyData: TRUE
+SystemRequirements: C++11
+Imports: Rcpp (>= 0.12.1), foreach, mvtnorm, matrixcalc, numDeriv,
+        splines, parallel, doParallel
+LinkingTo: Rcpp
+Depends: R (>= 3.1.0),
+RoxygenNote: 5.0.1
 NeedsCompilation: yes
+Packaged: 2015-11-15 21:55:18 UTC; jdtuck
 Repository: CRAN
-Date/Publication: 2014-01-29 16:24:06
+Date/Publication: 2015-11-16 08:20:07
