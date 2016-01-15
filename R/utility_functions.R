@@ -1,27 +1,108 @@
-cumtrapz <- function(x,y){
-    m = length(y)
+ndims <- function(x){
+    return(length(dim(x)))
+}
 
-    dt = diff(x)/2
-    z = c(0, cumsum(dt*(y[1:(m-1)] + y[2:m])))
+meshgrid <- function(x, y = x) {
+    if (!is.numeric(x) || !is.numeric(y))
+        stop("Arguments 'x' and 'y' must be numeric vectors.")
 
-    dim(z) = c(m,1)
+    x <- c(x); y <- c(y)
+    n <- length(x)
+    m <- length(y)
+
+    X <- matrix(rep(x, each = m),  nrow = m, ncol = n)
+    Y <- matrix(rep(y, times = n), nrow = m, ncol = n)
+
+    return(list(X = X, Y = Y))
+}
+
+gradient2 <- function(a,dx=1,dy=1){
+    m = dim(a)[1]
+    n = dim(a)[2]
+    dxdu = matrix(0,m,n)
+    dydv = matrix(0,m,n)
+
+    for (i in 1:m) {
+        dxdu[i,] = gradient(as.vector(a[i,]), dx)
+    }
+
+    for (i in 1:m) {
+        dydv[,i] = gradient(as.vector(a[,i]), dy)
+    }
+
+    return(list(dxdu=dxdu,dydv=dydv))
+}
+
+cumtrapz <- function(x,y,dims=1){
+    if ((dims-1)>0){
+        perm = c(dims:max(ndims(y),dims), 1:(dims-1))
+    } else {
+        perm = c(dims:max(ndims(y),dims))
+    }
+
+    if (ndims(y) == 0){
+        n = 1
+        m = length(y)
+    } else {
+        if (length(x) != dim(y)[dims])
+            stop('Dimension Mismatch')
+        y = aperm(y, perm)
+        m = nrow(y)
+        n = ncol(y)
+    }
+
+    if (n==1){
+        dt = diff(x)/2.0
+        z = c(0, cumsum(dt*(y[1:(m-1)] + y[2:m])))
+        dim(z) = c(m,1)
+    } else {
+        tmp = diff(x)
+        dim(tmp) = c(m-1,1)
+        dt = repmat(tmp/2.0,1,n)
+        z = rbind(rep(0,n), apply(dt*(y[1:(m-1),] + y[2:m,]),2,cumsum))
+        perm2 = rep(0, length(perm))
+        perm2[perm] = 1:length(perm)
+        z = aperm(z, perm2)
+    }
 
     return(z)
 }
 
-trapz <- function(x,y){
-    M = nrow(y)
-    if (is.null(M)){
+trapz <- function(x,y,dims=1){
+    if ((dims-1)>0){
+        perm = c(dims:max(ndims(y),dims), 1:(dims-1))
+    } else {
+        perm = c(dims:max(ndims(y),dims))
+    }
+
+    if (ndims(y) == 0){
+        m = 1
+    } else {
+        if (length(x) != dim(y)[dims])
+            stop('Dimension Mismatch')
+        y = aperm(y, perm)
+        m = nrow(y)
+    }
+
+    if (m==1){
         M = length(y)
         out = sum(diff(x)*(y[-M]+y[-1])/2)
-    }else{
-        M = nrow(y)
-        N = ncol(y)
-        out = rep(0,N)
-        for (i in 1:N){
-            out[i] = sum(diff(x)*(y[-M,i]+y[-1,i])/2)
-        }
+    } else {
+        slice1 = y[as.vector(outer(1:(m-1), dim(y)[1]*( 1:prod(dim(y)[-1])-1 ), '+')) ] 
+        dim(slice1) = c(m-1, length(slice1)/(m-1)) 
+        slice2 = y[as.vector(outer(2:m, dim(y)[1]*( 1:prod(dim(y)[-1])-1 ), '+'))] 
+        dim(slice2) = c(m-1, length(slice2)/(m-1)) 
+        out = t(diff(x)) %*% (slice1+slice2)/2.
+        siz = dim(y)
+        siz[1] = 1
+        out = array(out, siz)
+        perm2 = rep(0, length(perm))
+        perm2[perm] = 1:length(perm)
+        out = aperm(out, perm2)
+        ind = which(dim(out) != 1)
+        out = array(out, dim(out)[ind])
     }
+
     return(out)
 }
 
@@ -98,7 +179,7 @@ cumtraps <- function(x,y){
     return(z)
 }
 
-pvecnorm <-function(v,p){
+pvecnorm <-function(v,p=2){
     sum(abs(v)^p)^(1/p)
 }
 
@@ -399,6 +480,7 @@ repmat <- function(X,m,n){
   if (is.null(mx)){
     mx = 1
     nx = length(X)
+    mat = matrix(t(matrix(X,mx,nx*n)),mx*m,nx*n,byrow=T)
   }else {
     nx = dim(X)[2]
     mat = matrix(t(matrix(X,mx,nx*n)),mx*m,nx*n,byrow=T)
@@ -703,7 +785,7 @@ interp1_flat <- function(x,y,xx){
             i1 = i2
           }
         }
-        
+
         i2 = length(x)
         j = (xx>=x[i1]) & (xx<=x[i2])
         if ((i1+1) == i2){
@@ -714,4 +796,24 @@ interp1_flat <- function(x,y,xx){
     }
 
     return(yy)
+}
+
+
+circshift <- function(a, sz) {
+    if (is.null(a)) return(a)
+
+    if (is.vector(a) && length(sz) == 1) {
+        n <- length(a)
+        s <- sz %% n
+        a <- a[(1:n-s-1) %% n + 1]
+
+    } else if (is.matrix(a) && length(sz) == 2) {
+        n <- nrow(a); m <- ncol(a)
+        s1 <- sz[1] %% n
+        s2 <- sz[2] %% m
+        a <- a[(1:n-s1-1) %% n + 1, (1:m-s2-1) %% m + 1]
+    } else
+        stop("Length of 'sz' must be equal to the no. of dimensions of 'a'.")
+
+    return(a)
 }

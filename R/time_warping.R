@@ -1,7 +1,7 @@
 #' Group-wise function alignment
 #'
 #' This function aligns a collection of functions using the elastic square-root
-#' velocity (srvf) framework.
+#' slope (srsf) framework.
 #'
 #' @param f matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples
 #' @param time vector of size \eqn{N} describing the sample points
@@ -15,18 +15,19 @@
 #'   \code{doParallel} pacakge
 #' @param cores set number of cores to use with \code{doParallel} (default = 2)
 #' @param omethod optimization method (DP,DP2,SIMUL,RBFGS)
+#' @param MaxItr maximum number of iterations
 #' @return Returns a list containing \item{f0}{original functions}
 #' \item{fn}{aligned functions - matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
-#' \item{qn}{aligned srvfs - similar structure to fn}
-#' \item{q0}{original srvf - similar structure to fn}
+#' \item{qn}{aligned SRSFs - similar structure to fn}
+#' \item{q0}{original SRSF - similar structure to fn}
 #' \item{fmean}{function mean or median - vector of length \eqn{N}}
-#' \item{mqn}{srvf mean or median - vector of length \eqn{N}}
+#' \item{mqn}{SRSF mean or median - vector of length \eqn{N}}
 #' \item{gam}{warping functions - similar structure to fn}
 #' \item{orig.var}{Original Variance of Functions}
 #' \item{amp.var}{Amplitude Variance}
 #' \item{phase.var}{Phase Variance}
 #' \item{qun}{Cost Function Value}
-#' @keywords srvf alignment
+#' @keywords srsf alignment
 #' @references Srivastava, A., Wu, W., Kurtek, S., Klassen, E., Marron, J. S.,
 #'  May 2011. Registration of functional data using fisher-rao metric,
 #'  arXiv:1103.3817v2 [math.ST].
@@ -36,10 +37,10 @@
 #' @export
 #' @examples
 #' data("simu_data")
-#' out = time_warping(simu_data$f,simu_data$time)
+#' out = time_warping(simu_data$f,simu_data$time, MaxItr=1) # use more iterations for accuracy
 time_warping <- function(f, time, lambda = 0, method = "mean",
                          showplot = TRUE, smooth_data = FALSE, sparam = 25,
-                         parallel = FALSE, cores=2, omethod = "DP"){
+                         parallel = FALSE, cores=2, omethod = "DP", MaxItr = 20){
     if (parallel){
         cl = makeCluster(cores)
         registerDoParallel(cl)
@@ -94,10 +95,9 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
 
     # Compute Mean
     if (method == 1)
-        cat(sprintf("Computing Karcher mean of %d functions in SRVF space...\n",N))
+        cat(sprintf("Computing Karcher mean of %d functions in SRSF space...\n",N))
     if (method == 2)
-        cat(sprintf("Computing median of %d functions in SRVF space...\n",N))
-    MaxItr = 20
+        cat(sprintf("Computing median of %d functions in SRSF space...\n",N))
     ds = rep(0,MaxItr+2)
     ds[1] = Inf
     qun = rep(0,MaxItr)
@@ -179,7 +179,7 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
 
             qun[r] = pvecnorm(mq[,r+1]-mq[,r],2)/pvecnorm(mq[,r],2)
         }
-        if (qun[r] < 1e-2 || r >=MaxItr){
+        if (qun[r] < 1e-4 || r >=MaxItr){
             break
         }
     }

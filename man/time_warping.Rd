@@ -6,7 +6,7 @@
 \usage{
 time_warping(f, time, lambda = 0, method = "mean", showplot = TRUE,
   smooth_data = FALSE, sparam = 25, parallel = FALSE, cores = 2,
-  omethod = "DP")
+  omethod = "DP", MaxItr = 20)
 }
 \arguments{
 \item{f}{matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
@@ -30,14 +30,16 @@ or "median", default = "mean")}
 \item{cores}{set number of cores to use with \code{doParallel} (default = 2)}
 
 \item{omethod}{optimization method (DP,DP2,SIMUL,RBFGS)}
+
+\item{MaxItr}{maximum number of iterations}
 }
 \value{
 Returns a list containing \item{f0}{original functions}
 \item{fn}{aligned functions - matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
-\item{qn}{aligned srvfs - similar structure to fn}
-\item{q0}{original srvf - similar structure to fn}
+\item{qn}{aligned SRSFs - similar structure to fn}
+\item{q0}{original SRSF - similar structure to fn}
 \item{fmean}{function mean or median - vector of length \eqn{N}}
-\item{mqn}{srvf mean or median - vector of length \eqn{N}}
+\item{mqn}{SRSF mean or median - vector of length \eqn{N}}
 \item{gam}{warping functions - similar structure to fn}
 \item{orig.var}{Original Variance of Functions}
 \item{amp.var}{Amplitude Variance}
@@ -46,11 +48,11 @@ Returns a list containing \item{f0}{original functions}
 }
 \description{
 This function aligns a collection of functions using the elastic square-root
-velocity (srvf) framework.
+slope (srsf) framework.
 }
 \examples{
 data("simu_data")
-out = time_warping(simu_data$f,simu_data$time)
+out = time_warping(simu_data$f,simu_data$time, MaxItr=1) # use more iterations for accuracy
 }
 \references{
 Srivastava, A., Wu, W., Kurtek, S., Klassen, E., Marron, J. S.,
@@ -62,5 +64,5 @@ Tucker, J. D., Wu, W., Srivastava, A.,
  Computational Statistics and Data Analysis (2012), 10.1016/j.csda.2012.12.001.
 }
 \keyword{alignment}
-\keyword{srvf}
+\keyword{srsf}
 
