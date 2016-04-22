@@ -1,13 +1,13 @@
-0284bc4d88be2721dcecd913a2cf063b *DESCRIPTION
+944121694a46006fce890b9a92ddc3da *DESCRIPTION
 eb3cb1e9e2dec6261dac16518f03862f *NAMESPACE
-e5ec6c2c9747f2fd9aa459a9cf4b7dfe *NEWS
+e16c4d0aca097c6962effa87d1345564 *NEWS
 bb1169e98b511027512c30033d97eb97 *R/SqrtMean.R
 394b09a8b24522c9afc8c6f53a5f53db *R/align_fPCA.R
 6a220ed20649a9b4c75772e4230a989d *R/calc_shape_dist.R
 caf90fe4e4a628bf1bdadab5e01b431f *R/curve_functions.R
 cfcb2d8c34a1a3e0a8c2a150a2409330 *R/curve_geodesic.R
 e05c352c2be99f4625209e634883cd7a *R/curve_karcher_cov.R
-844d7a47201568a127095e4ee9d6c53c *R/curve_karcher_mean.R
+4c74033e4c98710508fab38343361aca *R/curve_karcher_mean.R
 23863c74601d85d444eb45a8d6530f16 *R/curve_pair_align.R
 962fcee93d45da2688518ce0c8378362 *R/curve_principal_directions.R
 439e7bfebd66c20dd0ea1c57ef506e21 *R/curve_srvf_align.R
@@ -40,7 +40,7 @@ a16ffd294febee0bcc1c108fcd685d6c *R/srsf_to_f.R
 c93d94b52cff7e0d4f198eddf2156339 *R/vertFPCA.R
 f004e6094af729f4f746cb5e48960446 *R/warp_f_gamma.R
 1acda620753cd064342793d0575f3cd9 *R/warp_q_gamma.R
-056fd287a6d8582b64326c6a46bd3c74 *README.md
+f61007fff59ff517d5ae9d89981cd675 *README.md
 8e9a2ef80e634e8ec145bc88f217d722 *data/datalist
 8e1ebadade722c18043cb86cbd23cf1c *data/mpeg7.RData
 8625b00e10e8daee01bd6c0b20952d77 *data/simu_data.RData
