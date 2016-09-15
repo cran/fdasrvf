@@ -1,21 +1,21 @@
 Package: fdasrvf
 Type: Package
 Title: Elastic Functional Data Analysis
-Version: 1.6.2
-Date: 2016-8-21
+Version: 1.7.0
+Date: 2016-9-14
 Author: J. Derek Tucker <jdtuck@sandia.gov>
 Maintainer: J. Derek Tucker <jdtuck@sandia.gov>
 Description: Functions to support functional data analysis using the square root velocity framework.
 License: GPL-3
 LazyData: TRUE
 SystemRequirements: C++11
-Imports: Rcpp (>= 0.12.1), foreach, mvtnorm, matrixcalc, splines,
+Imports: Rcpp (>= 0.12.1), coda, foreach, mvtnorm, matrixcalc, splines,
         parallel, fields, doParallel
 Suggests: akima
-LinkingTo: Rcpp
+LinkingTo: Rcpp, RcppArmadillo
 Depends: R (>= 3.1.0),
 RoxygenNote: 5.0.1
 NeedsCompilation: yes
-Packaged: 2016-08-22 00:53:46 UTC; jdtuck
+Packaged: 2016-09-15 03:57:29 UTC; jdtuck
 Repository: CRAN
-Date/Publication: 2016-08-22 10:00:18
+Date/Publication: 2016-09-15 08:14:08
