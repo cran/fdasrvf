@@ -14,7 +14,7 @@
 #' @param parallel enable parallel mode using \code{\link{foreach}} and
 #'   \code{doParallel} pacakge
 #' @param cores set number of cores to use with \code{doParallel} (default = 2)
-#' @param omethod optimization method (DP,DP2,SIMUL,RBFGS)
+#' @param omethod optimization method (DP,DP2,RBFGS)
 #' @param MaxItr maximum number of iterations
 #' @return Returns a list containing \item{f0}{original functions}
 #' \item{fn}{aligned functions - matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
@@ -88,17 +88,17 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
     }
 
     gam = t(gam)
-    gamI = SqrtMeanInverse(gam)
+    gamI = SqrtMeanInverse(t(gam))
     gamI_dev = gradient(gamI, 1/(M-1))
     mf = approx(time,mf,xout=(time[length(time)]-time[1])*gamI + time[1])$y
     mq = f_to_srvf(mf,time)
     mq[is.nan(mq)] <- 0
 
-    # Compute Mean
+    # Compute Mean or Median
     if (method == 1)
         cat(sprintf("Computing Karcher mean of %d functions in SRSF space...\n",N))
     if (method == 2)
-        cat(sprintf("Computing median of %d functions in SRSF space...\n",N))
+        cat(sprintf("Computing Karcher median of %d functions in SRSF space...\n",N))
     ds = rep(0,MaxItr+2)
     ds[1] = Inf
     qun = rep(0,MaxItr)
@@ -114,7 +114,9 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
     tmp = array(0,dim=c(M,N,MaxItr+2))
     tmp[,,1] = q
     q = tmp
-    qun = rep(0,MaxItr+1)
+    qun = rep(0,MaxItr+2)
+    qun[1] = pvecnorm(mq[,1]-q[,min_ind,1],2)/pvecnorm(q[,min_ind,1],2)
+    stp <- .3
     for (r in 1:MaxItr){
         cat(sprintf("updating step: r=%d\n", r))
         if (r == MaxItr){
@@ -128,7 +130,12 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
             f_temp = approx(time,f[,k,1],xout=(time[length(time)]-time[1])*gam +
                 time[1])$y
             q_temp = f_to_srvf(f_temp,time)
-            list(gam,gam_dev,q_temp,f_temp)
+            v <- q_temp - mq[,r]
+            d <- sqrt(trapz(time,v*v))
+            vtil <- v/d
+            dtil <- 1/d
+
+            list(gam,gam_dev,q_temp,f_temp,vtil,dtil)
         }
         gam = unlist(outfor[1,]);
         dim(gam)=c(M,N)
@@ -143,10 +150,14 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
         q[,,r+1] = q_temp
         f[,,r+1] = f_temp
         tmp = (1-sqrt(gam_dev))^2
+        vtil = unlist(outfor[5,]);
+        dim(vtil)=c(M,N)
+        dtil = unlist(outfor[6,]);
+        dim(dtil)=c(1,N)
 
         if (method == 1){ # Mean
-            ds_tmp  = sum(simpson(time,(matrix(mq[,r],M,N)-q[,,r+1])^2)) +
-                lambda*sum(simpson(time, t(tmp)))
+            ds_tmp  = sum(trapz(time,(matrix(mq[,r],M,N)-q[,,r+1])^2)) +
+                lambda*sum(trapz(time, t(tmp)))
             if (is.complex(ds_tmp)){
                 ds[r+1] = abs(ds_tmp)
             }
@@ -159,12 +170,12 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
             mq[,r+1] = rowMeans(q[,,r+1])
             mf[,r+1] = rowMeans(f[,,r+1])
 
-            qun[r] = pvecnorm(mq[,r+1]-mq[,r],2)/pvecnorm(mq[,r],2)
+            qun[r+1] = pvecnorm(mq[,r+1]-mq[,r],2)/pvecnorm(mq[,r],2)
         }
 
         if (method == 2){ # Median
-            ds_tmp = sqrt(sum(simpson(time,(matrix(mq[,r],M,N)-q[,,r+1])^2))) +
-                lambda*sum(simpson(time, t(tmp)))
+            ds_tmp = sqrt(sum(trapz(time,(q[,,r+1]-matrix(mq[,r],M,N))^2))) +
+                lambda*sum(trapz(time, t(tmp)))
             if (is.complex(ds_tmp)){
                 ds[r+1] = abs(ds_tmp)
             }
@@ -174,13 +185,13 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
 
             # Minimization Step
             # compute the median of the matched function
-            dist_iinv = (sum(1/ds[r+1]))^(-1)
-            mq[,r+1] = (rowSums(q[,,r+1]/ds[r+1]))*dist_iinv
-            mf[,r+1] = (rowSums(f[,,r+1]/ds[r+1]))*dist_iinv
+            vbar <- rowSums(vtil)*sum(dtil)^(-1)
+            mq[,r+1] <- mq[,r] + stp*vbar
+            mf[,r+1] <- median(f[1,,1]) + cumtrapz(time,mq[,r+1]*abs(mq[,r+1]))
 
-            qun[r] = pvecnorm(mq[,r+1]-mq[,r],2)/pvecnorm(mq[,r],2)
+            qun[r+1] = pvecnorm(mq[,r+1]-mq[,r],2)/pvecnorm(mq[,r],2)
         }
-        if (qun[r] < 1e-4 || r >=MaxItr){
+        if (qun[r+1] < 1e-4 || r >=MaxItr){
             break
         }
     }
@@ -199,7 +210,7 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
     dim(gam_dev)=c(M,N)
     gam_dev = t(gam_dev)
 
-    gamI = SqrtMeanInverse(gam)
+    gamI = SqrtMeanInverse(t(gam))
     gamI_dev = gradient(gamI, 1/(M-1))
     mq[,r+1] = approx(time,mq[,r],xout=(time[length(time)]-time[1])*gamI +
         time[1])$y*sqrt(gamI_dev)
@@ -222,7 +233,11 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
     mean_fn = rowMeans(fn)
     std_fn = apply(fn, 1, sd)
     mqn = mq[,r+1]
-    fmean = mean(f0[1,])+cumtrapz(time,mqn*abs(mqn));
+    if (method==1){
+      fmean = mean(f0[1,])+cumtrapz(time,mqn*abs(mqn));
+    } else {
+      fmean = median(f0[1,])+cumtrapz(time,mqn*abs(mqn));
+    }
     gam = t(gam)
 
     fgam = matrix(0,M,N)
@@ -264,6 +279,6 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
 
 
     return(list(f0=f[,,1],fn=fn,qn=qn,q0=q0,fmean=fmean,mqn=mqn,gam=gam,
-                            orig.var=orig.var,amp.var=amp.var,phase.var=phase.var,qun=qun))
+                            orig.var=orig.var,amp.var=amp.var,phase.var=phase.var,qun=qun[1:r]))
 
 }

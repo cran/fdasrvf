@@ -1,5 +1,6 @@
 mpeg7: beta
 simu_data
 simu_warp
+simu_warp_median
 toy_data
 toy_warp

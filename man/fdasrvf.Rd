@@ -4,6 +4,7 @@
 \name{fdasrvf}
 \alias{fdasrvf}
 \alias{fdasrvf-package}
+\alias{fdasrvf-package}
 \title{Elastic Functional Data Analysis}
 \description{
 A library for functional data analysis using the square root
@@ -35,5 +36,6 @@ Cheng, W., Dryden, I. L., and Huang, X. (2016). Bayesian registration of functio
 Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape analysis of elastic curves in euclidean spaces. Pattern Analysis and Machine Intelligence, IEEE Transactions on 33 (7), 1415-1428.
 
 Cheng, W., Dryden, I. L., and Huang, X. (2016). Bayesian registration of functions and curves. Bayesian Analysis, 11(2), 447-475.
-}
 
+Xie, W., S. Kurtek, K. Bharath, and Y. Sun  (2016). "A Geometric Approach to Visualization of Variability in Functional Data." Journal of the American Statistical Association in press: 1-34.
+}

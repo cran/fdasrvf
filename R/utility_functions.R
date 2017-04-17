@@ -223,95 +223,6 @@ resample.f <- function(f, timet, N=100){
   return(list(fn=fn,timet=newdel))
 }
 
-SqrtMeanInverse <- function(gam){
-    n = nrow(gam)
-    T1 = ncol(gam)
-    dt = 1/(T1-1)
-    psi = matrix(0,n,T1-1)
-    for (i in 1:n){
-        psi[i,] = sqrt(diff(gam[i,])/dt+.Machine$double.eps)
-    }
-
-    # Find direction
-    mnpsi = colMeans(psi)
-    dqq = sqrt(colSums((t(psi) - matrix(mnpsi,ncol=n,nrow=T1-1))^2))
-    min_ind = which.min(dqq)
-    mu = psi[min_ind,]
-    tt = 1
-    maxiter = 20
-    eps = .Machine$double.eps
-    lvm = rep(0,1,maxiter)
-    vec = matrix(0,n,T1-1)
-    for (iter in 1:maxiter){
-        for (i in 1:n){
-            v = psi[i,] - mu
-            dot<- simpson(seq(0,1,length.out=T1-1),mu*psi[i,])
-            dot.limited<- ifelse(dot>1, 1, ifelse(dot<(-1), -1, dot))
-            len = acos(dot.limited)
-            if (len > 0.0001){
-                vec[i,] = (len/sin(len))*(psi[i,] - cos(len)*mu)
-            }else{
-                vec[i,] = rep(0,T1-1)
-            }
-        }
-        vm = colMeans(vec)
-        lvm[iter] = sqrt(sum(vm*vm)*dt)
-        if (sum(vm) == 0){ # we had a problem, pick id (i.e., they are all id)
-            mu = rep(1,T1-1)
-            break
-        }else{
-            mu = cos(tt*lvm[iter])*mu + (sin(tt*lvm[iter])/lvm[iter])*vm
-            if (lvm[iter] < 1e-6 || iter >=maxiter){
-                break
-            }
-        }
-
-    }
-    gam_mu = c(0,cumsum(mu*mu))/T1
-    gam_mu = (gam_mu - min(gam_mu))/(max(gam_mu)-min(gam_mu))
-    gamI = invertGamma(gam_mu)
-    return(gamI)
-}
-
-invertGamma <- function(gam){
-    N = length(gam)
-    x = (0:(N-1))/(N-1)
-    gamI = approx(gam,x,xout=x)$y
-    gamI[N] = 1
-    gamI = gamI/gamI[N]
-    return(gamI)
-}
-
-randomGamma <- function(gam,num){
-    out = SqrtMean(gam)
-    mu = out$mu
-    psi = out$psi
-    vec = out$vec
-
-    K = cov(t(vec))
-    out = svd(K)
-    s = out$d
-    U = out$u
-    n = 5
-    TT = nrow(vec) + 1
-    vm = rowMeans(vec)
-
-    rgam = matrix(0,num,TT)
-    for (k in 1:num){
-        a = rnorm(n)
-        v = rep(0,length(vm))
-        for (i in 1:n){
-            v = v + a[i]*sqrt(s[i])*U[,i]
-        }
-        vn = pvecnorm(v,2)/sqrt(TT)
-        psi = cos(vn)*mu + sin(vn)*v/vn
-        tmp = rep(0,TT)
-        tmp[2:TT] = cumsum(psi*psi)
-        rgam[k,] = tmp/TT
-    }
-    return(rgam)
-}
-
 f_K_fold <- function(Nobs,K=5){
     rs <- runif(Nobs)
     id <- seq(Nobs)[order(rs)]
@@ -419,9 +330,8 @@ svd2 <- function (x, nu = min(n, p), nv = min(n, p), LINPACK = FALSE)
     svd.x
 }
 
-cumtrapzmid <- function(x,y,c){
+cumtrapzmid <- function(x,y,c,mid){
     a = length(x)
-    mid = round(a/2)
 
     # case < mid
     fn = rep(0,a)
@@ -434,14 +344,6 @@ cumtrapzmid <- function(x,y,c){
     fn[mid:a] = c + cumtrapz(x[mid:a],y[mid:a])
 
     return(fn)
-}
-
-warp_q_gamma <- function(time, q, gam){
-  M = length(gam)
-  gam_dev = gradient(gam, 1/(M-1))
-  q_tmp = approx(time,q,xout=(time[length(time)]-time[1])*gam +
-               time[1])$y*sqrt(gam_dev)
-  return(q_tmp)
 }
 
 zero_crossing <- function(Y, q, bt, time, y_max, y_min, gmax, gmin){
@@ -835,38 +737,6 @@ Qt.matrix <- function(input, newt = seq(0,1,1/(dim(input)[1]-1))){
   return(Qt)
 }
 
-findkarcherinv <- function(warps, times, round = F){
-  m <- dim(warps)[1]
-  n <- dim(warps)[2]
-  psi.m <- matrix(0,m-1,n)
-  for(j in 1:n){psi.m[,j]<- sqrt(diff(warps[,j])/times)}
-  w <- apply(psi.m,1,mean)
-  mupsi <- w/sqrt(sum(w^2/(m-1)))
-  v.m <- matrix(0,m-1,n)
-  check <- 1
-  while(check > 0.01){
-    for (i in 1:n){
-      theta <- acos(sum(mupsi*psi.m[,i]/(m-1)))
-      v.m[,i] <- theta/sin(theta)*(psi.m[,i]-cos(theta)*mupsi)
-    }
-    vbar <- apply(v.m,1,mean)
-    check <- Enorm(vbar)/sqrt(m-1)
-    if (check>0){
-      mupsi.update <- cos(0.01*Enorm(vbar)/sqrt(m-1))*mupsi+sin(0.01*Enorm(vbar)/sqrt(m-1))*vbar/(Enorm(vbar)/sqrt(m-1))
-    }
-    else { mupsi.update <- cos(0.01*Enorm(vbar)/sqrt(m-1))*mupsi}
-  }
-  karcher.s <- 1+c(0,cumsum(mupsi.update^2)*times)
-  if(round){
-    invidy <- c(round(approx(karcher.s,seq(1,(m-1)*times+1,times),method="linear",xout=1:((m-1)*times))$y),(m-1)*times+1)
-  }
-  else{
-    invidy <- c((approx(karcher.s,seq(1,(m-1)*times+1,times),method="linear",xout=1:((m-1)*times))$y),(m-1)*times+1)
-  }
-  revscalevec <- sqrt(diff(invidy))
-  return(list(invidy = invidy,revscalevec = revscalevec))
-}
-
 Enorm<-function(X)
 {
   #finds Euclidean norm of real matrix X
@@ -876,7 +746,7 @@ Enorm<-function(X)
   else {
     n <- sqrt(sum(diag(t(X) %*% X)))
   }
-  n
+  return(n)
 }
 
 qtocurve <- function(qt, t = seq(0,1,length = length(qt)+1)){
@@ -892,4 +762,18 @@ st<-function(zstar)
   #output transpose of the complex conjugate
   st <- t(Conj(zstar))
   st
+}
+
+l2_norm<-function(psi){
+  M <- length(psi)
+  time <- seq(0,1,length.out=M)
+  l2norm <- sqrt(trapz(time,psi*psi))
+  return(l2norm)
+}
+
+inner_product<-function(psi1, psi2){
+  M <- length(psi1)
+  time <- seq(0,1,length.out=M)
+  ip <- trapz(time,psi1*psi2)
+  return(ip)
 }
