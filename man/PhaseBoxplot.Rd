@@ -2,14 +2,16 @@
 % Please edit documentation in R/PhaseBoxplot.R
 \name{PhaseBoxplot}
 \alias{PhaseBoxplot}
-\title{SRVF transform of warping functions}
+\title{Phase Boxplot}
 \usage{
-PhaseBoxplot(gam, kp, showplot = T)
+PhaseBoxplot(gam, alpha = 0.05, kp = 1, showplot = T)
 }
 \arguments{
 \item{gam}{matrix (\eqn{N} x \eqn{M}) of \eqn{M} warping functions with \eqn{N} samples}
 
-\item{kp}{scalar for outlier cutoff}
+\item{alpha}{quantile value (default=.05, i.e., 95\%)}
+
+\item{kp}{scalar for outlier cutoff (default=1)}
 
 \item{showplot}{shows plots of functions (default = T)}
 }
@@ -17,17 +19,18 @@ PhaseBoxplot(gam, kp, showplot = T)
 Returns a list containing \item{median_x}{median warping function}
 \item{Q1}{First quartile}
 \item{Q3}{Second quartile}
+\item{Q1a}{First quantile based on alpha}
+\item{Q3a}{Second quantile based on alpha}
 \item{minn}{minimum extreme function}
 \item{maxx}{maximum extreme function}
 \item{outlier_index}{indexes of outlier functions}
 }
 \description{
-This function calculates the srvf of warping functions with corresponding
-shooting vectors and finds the median
+This function constructs the amplitude boxplot
 }
 \examples{
 data("simu_warp_median")
-out = PhaseBoxplot(simu_warp_median$gam, 1)
+out <- PhaseBoxplot(simu_warp_median$gam)
 }
 \references{
 Xie, W., S. Kurtek, K. Bharath, and Y. Sun  (2016). "A Geometric Approach to Visualization

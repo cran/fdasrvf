@@ -5,8 +5,8 @@
 \title{Group-wise function alignment}
 \usage{
 time_warping(f, time, lambda = 0, method = "mean", showplot = TRUE,
-  smooth_data = FALSE, sparam = 25, parallel = FALSE, cores = 2,
-  omethod = "DP", MaxItr = 20)
+  smooth_data = FALSE, sparam = 25, parallel = FALSE, omethod = "DP",
+  MaxItr = 20)
 }
 \arguments{
 \item{f}{matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
@@ -25,9 +25,7 @@ or "median", default = "mean")}
 \item{sparam}{number of times to apply box filter (default = 25)}
 
 \item{parallel}{enable parallel mode using \code{\link{foreach}} and
-\code{doParallel} pacakge}
-
-\item{cores}{set number of cores to use with \code{doParallel} (default = 2)}
+\code{doParallel} pacakge (default=F)}
 
 \item{omethod}{optimization method (DP,DP2,RBFGS)}
 

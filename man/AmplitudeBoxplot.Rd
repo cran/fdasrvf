@@ -2,9 +2,10 @@
 % Please edit documentation in R/AmplitudeBoxplot.R
 \name{AmplitudeBoxplot}
 \alias{AmplitudeBoxplot}
-\title{SRVF transform of warping functions}
+\title{Amplitude Boxplot}
 \usage{
-AmplitudeBoxplot(fn, fmedian, qn, qmedian, time, ka, showplot = T)
+AmplitudeBoxplot(fn, fmedian, qn, qmedian, time, alpha = 0.05, ka = 1,
+  showplot = T)
 }
 \arguments{
 \item{fn}{matrix (\eqn{N} x \eqn{M}) of \eqn{M} aligned functions with \eqn{N} samples}
@@ -17,7 +18,9 @@ AmplitudeBoxplot(fn, fmedian, qn, qmedian, time, ka, showplot = T)
 
 \item{time}{vector of size \eqn{N} describing the sample points}
 
-\item{ka}{scalar for outlier cutoff}
+\item{alpha}{quantile value (default=.05, i.e., 95\%)}
+
+\item{ka}{scalar for outlier cutoff (default=1)}
 
 \item{showplot}{shows plots of functions (default = T)}
 }
@@ -25,19 +28,20 @@ AmplitudeBoxplot(fn, fmedian, qn, qmedian, time, ka, showplot = T)
 Returns a list containing \item{median_y}{median function}
 \item{Q1}{First quartile}
 \item{Q3}{Second quartile}
+\item{Q1a}{First quantile based on alpha}
+\item{Q3a}{Second quantile based on alpha}
 \item{minn}{minimum extreme function}
 \item{maxx}{maximum extreme function}
 \item{outlier_index}{indexes of outlier functions}
 }
 \description{
-This function calculates the srvf of warping functions with corresponding
-shooting vectors and finds the median
+This function constructs the amplitude boxplot
 }
 \examples{
 data("simu_warp_median")
 data("simu_data")
-out = AmplitudeBoxplot(simu_warp_median$fn, simu_warp_median$fmean, simu_warp_median$qn,
-                       simu_warp_median$mqn, simu_data$time, 1)
+out <- AmplitudeBoxplot(simu_warp_median$fn, simu_warp_median$fmean,
+                        simu_warp_median$qn, simu_warp_median$mqn, simu_data$time)
 }
 \references{
 Xie, W., S. Kurtek, K. Bharath, and Y. Sun  (2016). "A Geometric Approach to Visualization
