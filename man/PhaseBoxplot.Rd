@@ -4,10 +4,10 @@
 \alias{PhaseBoxplot}
 \title{Phase Boxplot}
 \usage{
-PhaseBoxplot(gam, alpha = 0.05, kp = 1, showplot = T)
+PhaseBoxplot(warp_median, alpha = 0.05, kp = 1, showplot = TRUE)
 }
 \arguments{
-\item{gam}{matrix (\eqn{N} x \eqn{M}) of \eqn{M} warping functions with \eqn{N} samples}
+\item{warp_median}{fdawarp object from \link{time_warping} of aligned data using the median}
 
 \item{alpha}{quantile value (default=.05, i.e., 95\%)}
 
@@ -16,7 +16,7 @@ PhaseBoxplot(gam, alpha = 0.05, kp = 1, showplot = T)
 \item{showplot}{shows plots of functions (default = T)}
 }
 \value{
-Returns a list containing \item{median_x}{median warping function}
+Returns a phbox object containing \item{median_x}{median warping function}
 \item{Q1}{First quartile}
 \item{Q3}{Second quartile}
 \item{Q1a}{First quantile based on alpha}
@@ -30,7 +30,7 @@ This function constructs the amplitude boxplot
 }
 \examples{
 data("simu_warp_median")
-out <- PhaseBoxplot(simu_warp_median$gam)
+out <- PhaseBoxplot(simu_warp_median, showplot=FALSE)
 }
 \references{
 Xie, W., S. Kurtek, K. Bharath, and Y. Sun  (2016). "A Geometric Approach to Visualization

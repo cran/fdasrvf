@@ -1,10 +1,10 @@
-#' Gradient using finite diferences
+#' Gradient using finite differences
 #'
 #' This function takes the gradient of f using finite differences
 #'
 #' @param f vector with \eqn{N} samples
 #' @param binsize scalar of time samples
-#' @return g vecotr with \eqn{N} samples which is the gradient of f
+#' @return g vector with \eqn{N} samples which is the gradient of f
 #' @keywords srvf alignment
 #' @export
 #' @examples

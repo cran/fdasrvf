@@ -6,16 +6,16 @@
 #' @param f matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples
 #' @param time vector of size \eqn{N} describing the sample points
 #' @param lambda controls the elasticity (default = 0)
-#' @param method warp and caluclate to Karcher Mean or Median (options = "mean"
+#' @param method warp and calculate to Karcher Mean or Median (options = "mean"
 #' or "median", default = "mean")
 #' @param showplot shows plots of functions (default = T)
 #' @param smooth_data smooth data using box filter (default = F)
 #' @param sparam number of times to apply box filter (default = 25)
 #' @param parallel enable parallel mode using \code{\link{foreach}} and
-#'   \code{doParallel} pacakge (default=F)
+#'   \code{doParallel} package (default=F)
 #' @param omethod optimization method (DP,DP2,RBFGS)
 #' @param MaxItr maximum number of iterations
-#' @return Returns a list containing \item{f0}{original functions}
+#' @return Returns a fdawarp object containing \item{f0}{original functions}
 #' \item{fn}{aligned functions - matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
 #' \item{qn}{aligned SRSFs - similar structure to fn}
 #' \item{q0}{original SRSF - similar structure to fn}
@@ -49,6 +49,7 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
     {
         registerDoSEQ()
     }
+    method1 <- method
     method <- pmatch(method, c("mean", "median")) # 1 - mean, 2 - median
     if (is.na(method))
         stop("invalid method selection")
@@ -60,7 +61,7 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
     M = nrow(f)
     N = ncol(f)
     f0 = f
-    w = 0.0;
+    w = 0.0
 
     if (smooth_data){
         f = smooth.data(f,sparam)
@@ -251,34 +252,20 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
     amp.var = trapz(time,std_fn^2)
     phase.var = trapz(time,var_fgam)
 
+    out <- list(f0=f[,,1],time=time,fn=fn,qn=qn,q0=q0,fmean=fmean,mqn=mqn,gam=gam,
+                orig.var=orig.var,amp.var=amp.var,phase.var=phase.var,
+                qun=qun[1:r],lambda=lambda,method=method1,omethod=omethod,rsamps=F)
+
+    class(out) <- 'fdawarp'
+
     if (showplot){
-        matplot((0:(M-1))/(M-1),gam,type="l",main="Warping functions",xlab="Time")
-
-        matplot(time,fn,type="l",main=bquote(paste("Warped Data ",lambda ==
-            .(lambda))))
-
-        matplot(time,cbind(mean_f0,mean_f0+std_f0,mean_f0-std_f0),type="l",lty=1,
-                        col=c("blue","red","green"),
-                        ylab="",main=bquote(paste("Original Data: ", Mean %+-% STD)))
-        legend('topright',inset=0.01,legend=c('Mean','Mean + STD', 'Mean - STD'),
-                     col=c('blue','red','green'),lty=1)
-
-        matplot(time,cbind(mean_fn,mean_fn+std_fn,mean_fn-std_fn),type="l",lty=1,
-                        col=c("blue","red","green"),
-                        ylab="",main=bquote(paste("Warped Data: ",lambda == .(lambda),": ",
-                                                                            Mean %+-% STD)))
-        legend('topright',inset=0.01,legend=c('Mean','Mean + STD', 'Mean - STD'),
-                     col=c('blue','red','green'),lty=1)
-
-        plot(time,fmean,type="l",col="green",main=bquote(paste(f[mean]," ", lambda == .(lambda))))
+        plot(out)
     }
 
     if (parallel){
         stopCluster(cl)
     }
 
-
-    return(list(f0=f[,,1],fn=fn,qn=qn,q0=q0,fmean=fmean,mqn=mqn,gam=gam,
-                            orig.var=orig.var,amp.var=amp.var,phase.var=phase.var,qun=qun[1:r]))
+    return(out)
 
 }

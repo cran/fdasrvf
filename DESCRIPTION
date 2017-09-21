@@ -1,8 +1,8 @@
 Package: fdasrvf
 Type: Package
 Title: Elastic Functional Data Analysis
-Version: 1.8.1
-Date: 2017-4-17
+Version: 1.8.2
+Date: 2017-9-17
 Author: J. Derek Tucker <jdtuck@sandia.gov>
 Maintainer: J. Derek Tucker <jdtuck@sandia.gov>
 Description: Performs alignment, PCA, and modeling of multidimensional and
@@ -21,6 +21,6 @@ LinkingTo: Rcpp, RcppArmadillo
 Depends: R (>= 3.1.0),
 RoxygenNote: 6.0.1
 NeedsCompilation: yes
-Packaged: 2017-04-30 14:28:03 UTC; jdtuck
+Packaged: 2017-09-20 22:31:18 UTC; dtucker
 Repository: CRAN
-Date/Publication: 2017-04-30 19:10:57 UTC
+Date/Publication: 2017-09-21 19:43:32 UTC

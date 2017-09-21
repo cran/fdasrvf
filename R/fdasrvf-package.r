@@ -25,6 +25,7 @@
 #' @useDynLib fdasrvf, .registration=TRUE
 #' @import foreach mvtnorm matrixcalc splines parallel doParallel Rcpp fields
 #' @importFrom graphics layout legend matplot plot title lines image
+#' @importFrom grDevices rainbow
 #' @importFrom coda traceplot mcmc
 #' @importFrom viridisLite viridis
 #' @importFrom stats approx cov optim predict quantile rnorm runif sd smooth.spline var spline median
@@ -59,6 +60,17 @@ NULL
 #' @keywords datasets
 #' @name toy_data
 #' @usage data("toy_data")
+#' @format A list which contains f and time
+NULL
+#' Berkley Growth Velocity Dataset
+#'
+#' Combination of both boys and girls growth velocity from the Berkley Dataset
+#'
+#'
+#' @docType data
+#' @keywords datasets
+#' @name growth_vel
+#' @usage data("growth_vel")
 #' @format A list which contains f and time
 NULL
 #' Aligned Distributed Gaussian Peak Dataset
@@ -120,4 +132,15 @@ NULL
 #' @name beta
 #' @usage data("mpeg7")
 #' @format an array of shape (2,100,65,20)
+NULL
+#' Example Image Data set
+#'
+#' Contains two simulated images for registration
+#'
+#'
+#' @docType data
+#' @keywords datasets
+#' @name im
+#' @usage data("image")
+#' @format a list containing two images of dimension  (64,64)
 NULL
