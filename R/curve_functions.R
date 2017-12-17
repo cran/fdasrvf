@@ -10,7 +10,7 @@ calculatecentroid <- function(beta){
     for (i in 1:T1){
         integrand[,i] = beta[,i] * normbetadot[i]
     }
-    
+
     scale = trapz(seq(0,1,length.out=T1), normbetadot)
     centroid = trapz(seq(0,1,length.out=T1), integrand, 2)/scale
 
@@ -53,7 +53,7 @@ calculate_variance <- function(beta){
     T1 = ncol(beta)
     betadot = apply(beta,1,gradient,1.0/(T1-1))
     betadot = t(betadot)
-    
+
     normbetadot = rep(0,T)
     centroid = calculatecentroid(beta)
     integrand = array(0, c(n,n,T1))
@@ -147,7 +147,7 @@ shift_f <- function(f, tau){
 }
 
 
-find_rotation_seed_coord <- function(beta1, beta2){
+find_rotation_seed_coord <- function(beta1, beta2, mode="O"){
     n = nrow(beta1)
     T1 = ncol(beta1)
     q1 = curve_to_q(beta1)
@@ -163,7 +163,11 @@ find_rotation_seed_coord <- function(beta1, beta2){
 
     tau = which.min(Ltwo)
     O_hat = Rlist[,,tau]
-    beta2new = shift_f(beta2,tau)
+    if (mode=="C")
+      beta2new = shift_f(beta2,tau)
+    else
+      beta2new = beta2
+
     beta2new = O_hat %*% beta2new
 
     return(list(beta2new=beta2new,O_hat=O_hat,tau=tau))
@@ -228,13 +232,13 @@ project_curve <- function(q){
     if (n==2){
       dt = 0.35
     }
-    
+
     if (n==3) {
       dt = 0.2
     }
-    
+
     epsilon =- 1e-6
-    
+
     e = diag(1,n)
     iter = 1
     res = rep(1,n)
@@ -243,15 +247,15 @@ project_curve <- function(q){
     qnorm = rep(0,T1)
     G = rep(0,n)
     C = rep(0,301)
-    
+
     qnew = q
     qnew = qnew / sqrt(innerprod_q2(qnew,qnew))
-    
+
     while (pvecnorm(res) > epsilon){
         if (iter > 300){
             break
         }
-        
+
         # Compute Jacobian
         for (i in 1:n){
             for (j in 1:n){
@@ -259,34 +263,34 @@ project_curve <- function(q){
             }
         }
         J = J + diag(1,n)
-        
+
         for (i in 1:T1){
             qnorm[i] = pvecnorm(qnew[,i])
         }
-        
+
         # Compute the residue
         for (i in 1:n){
             G[i] = trapz(s,qnew[i,]*qnorm)
         }
-        
+
         res = -1*G
-        
+
         if (pvecnorm(res)<epsilon)
             break
-        
+
         x = solve(J,res)
         C[iter] = pvecnorm(res)
-        
+
         delG = find_basis_normal(qnew)
         tmp = 0
         for (i in 1:n){
             tmp = tmp + x[i]*delG[[i]]*dt
         }
         qnew = qnew + tmp
-        
+
         iter = iter + 1
     }
-    
+
     qnew = qnew / sqrt(innerprod_q2(qnew,qnew))
 
     return(qnew)
@@ -307,7 +311,7 @@ pre_proc_curve <- function(beta, T1=100){
 }
 
 
-inverse_exp_coord <- function(beta1, beta2, mode="O"){
+inverse_exp_coord <- function(beta1, beta2, mode="O", rotated=T){
     T1 = ncol(beta1)
     centroid1 = calculatecentroid(beta1)
     dim(centroid1) = c(length(centroid1),1)
@@ -317,30 +321,38 @@ inverse_exp_coord <- function(beta1, beta2, mode="O"){
     beta2 = beta2 - repmat(centroid2, 1, T1)
 
     q1 = curve_to_q(beta1)
-    
+
     if (mode=="C"){
       isclosed = TRUE
     }
 
     # Iteratively optimize over SO(n) x Gamma using old DP
-    out = reparam_curve(beta1, beta2, isclosed=isclosed)
-    beta2 = out$R %*% shift_f(beta2,out$tau)
+    out = reparam_curve(beta1, beta2, rotated=rotated, isclosed=isclosed, mode=mode)
+    if (mode=="C")
+      beta2 = shift_f(beta2, out$tau)
+
+    beta2 = out$R %*% beta2
     gamI = invertGamma(out$gam)
     beta2 = group_action_by_gamma_coord(beta2, gamI)
-    out = find_rotation_seed_coord(beta1, beta2)
-    q2n = curve_to_q(out$beta2new)
-    
+    if (rotated){
+      out = find_rotation_seed_coord(beta1, beta2, mode)
+      q2n = curve_to_q(out$beta2new)
+    } else {
+      q2n = curve_to_q(beta2)
+    }
+
+
     if (mode=="C"){
       q2n = project_curve(q2n)
     }
 
     # Compute geodesic distance
     q1dotq2 = innerprod_q2(q1, q2n)
-    dist = acos(q1dotq2)
-
     if (q1dotq2>1){
-        q1dotq2 = 1.
+      q1dotq2 = 1.
     }
+    
+    dist = acos(q1dotq2)
 
     u = q2n - q1dotq2 * q1
     normu = sqrt(innerprod_q2(u,u))
@@ -348,7 +360,7 @@ inverse_exp_coord <- function(beta1, beta2, mode="O"){
     if (normu > 1e-4){
         v = u*acos(q1dotq2)/normu
     } else {
-        v = matrix(0, 2, T1)
+        v = matrix(0, nrow(beta1), T1)
     }
 
     return(list(v=v,dist=dist))
@@ -366,7 +378,10 @@ inverse_exp <- function(q1, q2, beta2){
     beta1 = q_to_curve(q1)
     out = reparam_curve(beta1, beta2)
     gamI = invertGamma(out$gam)
-    beta2 = out$R %*% shift_f(beta2, out$tau)
+    if (mode=="C")
+      beta2 = shift_f(beta2, out$tau)
+
+    beta2 = out$R %*% beta2
 
     # Applying optimal re-parameterization to the second curve
     beta2 = group_action_by_gamma_coord(beta2, gamI)
@@ -378,11 +393,11 @@ inverse_exp <- function(q1, q2, beta2){
 
     # compute geodesic distance
     q1dotq2 = innerprod_q2(q1, q2)
-    dist = acos(q1dotq2)
-
     if (q1dotq2>1){
         q1dotq2 = 1.
     }
+    
+    dist = acos(q1dotq2)
 
     u = q2 - q1dotq2 * q1
     normu = sqrt(innerprod_q2(u,u))
@@ -469,12 +484,12 @@ rot_mat <- function(theta){
 }
 
 
-karcher_calc <- function(beta, q, betamean, mu, mode="O"){
+karcher_calc <- function(beta, q, betamean, mu, rotated=T, mode="O"){
     if (mode=="C"){
         basis = find_basis_normal(mu)
     }
     # Compute shooting vector form mu to q_i
-    out = inverse_exp_coord(betamean, beta)
+    out = inverse_exp_coord(betamean, beta, mode, rotated)
 
     # Project to tangent space of manifold to obtain v_i
     if (mode=="O"){

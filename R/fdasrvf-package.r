@@ -21,14 +21,15 @@
 #' @references Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape analysis of elastic curves in euclidean spaces. Pattern Analysis and Machine Intelligence, IEEE Transactions on 33 (7), 1415-1428.
 #' @references Cheng, W., Dryden, I. L., and Huang, X. (2016). Bayesian registration of functions and curves. Bayesian Analysis, 11(2), 447-475.
 #' @references Xie, W., S. Kurtek, K. Bharath, and Y. Sun  (2016). "A Geometric Approach to Visualization of Variability in Functional Data." Journal of the American Statistical Association in press: 1-34.
+#' @references Y. Lu, R. Herbei and S. Kurtek (2017). "Bayesian Registration of Functions with a Gaussian Process Prior." Journal of Computational and Graphical Statistics: in press: 1-34
 #' @docType package
 #' @useDynLib fdasrvf, .registration=TRUE
 #' @import foreach mvtnorm matrixcalc splines parallel doParallel Rcpp fields
-#' @importFrom graphics layout legend matplot plot title lines image
+#' @importFrom graphics layout legend matplot plot title lines image plot.new
 #' @importFrom grDevices rainbow
 #' @importFrom coda traceplot mcmc
 #' @importFrom viridisLite viridis
-#' @importFrom stats approx cov optim predict quantile rnorm runif sd smooth.spline var spline median
+#' @importFrom stats approx cov optim predict quantile rnorm runif sd smooth.spline var spline median rgamma
 #' @aliases fdasrvf fdasrvf-package
 NULL
 #' Simulated two Gaussian Dataset

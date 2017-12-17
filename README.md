@@ -12,7 +12,7 @@ analysis
 
 ### Installation
 ------------------------------------------------------------------------------
-v1.8.1 is on [CRAN](https://cran.r-project.org/package=fdasrvf)
+v1.8.2 is on [CRAN](https://cran.r-project.org/package=fdasrvf)
 and can be installed as
 > `install.packages("fdasrvf")`
 
@@ -68,3 +68,6 @@ Cheng, W., Dryden, I. L., and Huang, X. (2016). Bayesian registration of functio
 and curves. Bayesian Analysis, 11(2), 447-475.
 
 Xie, W., S. Kurtek, K. Bharath, and Y. Sun  (2016). "A Geometric Approach to Visualization of Variability in Functional Data." Journal of the American Statistical Association in press: 1-34.
+
+Y. Lu, R. Herbei and S. Kurtek (2017). "Bayesian Registration of Functions with a Gaussian Process Prior." Journal of Computational and Graphical Statistics: in press: 1-34
+

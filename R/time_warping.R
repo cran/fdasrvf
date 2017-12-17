@@ -42,7 +42,7 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
                          showplot = TRUE, smooth_data = FALSE, sparam = 25,
                          parallel = FALSE, omethod = "DP", MaxItr = 20){
     if (parallel){
-        cores = detectCores()
+        cores = detectCores()-1
         cl = makeCluster(cores)
         registerDoParallel(cl)
     } else
@@ -254,7 +254,7 @@ time_warping <- function(f, time, lambda = 0, method = "mean",
 
     out <- list(f0=f[,,1],time=time,fn=fn,qn=qn,q0=q0,fmean=fmean,mqn=mqn,gam=gam,
                 orig.var=orig.var,amp.var=amp.var,phase.var=phase.var,
-                qun=qun[1:r],lambda=lambda,method=method1,omethod=omethod,rsamps=F)
+                qun=qun[1:r],lambda=lambda,method=method1,omethod=omethod,gamI=gamI,rsamps=F)
 
     class(out) <- 'fdawarp'
 
