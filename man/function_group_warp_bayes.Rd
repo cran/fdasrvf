@@ -4,8 +4,9 @@
 \alias{function_group_warp_bayes}
 \title{Bayesian Group Warping}
 \usage{
-function_group_warp_bayes(f, time, iter = 50000, powera = 1, times = 5,
-  tau = ceiling(times * 0.04), gp = seq(dim(f)[2]), showplot = TRUE)
+function_group_warp_bayes(f, time, iter = 50000, powera = 1,
+  times = 5, tau = ceiling(times * 0.04), gp = seq(dim(f)[2]),
+  showplot = TRUE)
 }
 \arguments{
 \item{f}{matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
@@ -45,6 +46,5 @@ out = function_group_warp_bayes(simu_data$f, simu_data$time)
 Cheng, W., Dryden, I. L., and Huang, X. (2016). Bayesian
 registration of functions and curves. Bayesian Analysis, 11(2), 447-475.
 }
-\keyword{alignment,}
+\concept{srsf alignment}
 \keyword{bayesian}
-\keyword{srsf}

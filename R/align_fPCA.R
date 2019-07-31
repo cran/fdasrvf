@@ -26,14 +26,17 @@
 #' \item{latent}{latent values}
 #' \item{coef}{coefficients}
 #' \item{U}{eigenvectors}
-#' @keywords srvf alignment, pca
+#' @keywords pca
+#' @concept srvf alignment
 #' @references Tucker, J. D., Wu, W., Srivastava, A.,
 #'  Generative Models for Function Data using Phase and Amplitude Separation,
 #'  Computational Statistics and Data Analysis (2012), 10.1016/j.csda.2012.12.001.
 #' @export
 #' @examples
+#' \dontrun{
 #' data("simu_data")
-#' out = align_fPCA(simu_data$f,simu_data$time,MaxItr = 1)  # use more iterations for accuracy
+#' out = align_fPCA(simu_data$f,simu_data$time)
+#' }
 align_fPCA <- function(f, time, num_comp = 3, showplot = T, smooth_data = FALSE, sparam = 25,
                        parallel = FALSE, cores=8, MaxItr = 51){
     if (parallel){

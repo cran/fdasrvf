@@ -5,8 +5,8 @@
 \title{Group-wise function alignment}
 \usage{
 time_warping(f, time, lambda = 0, method = "mean", showplot = TRUE,
-  smooth_data = FALSE, sparam = 25, parallel = FALSE, omethod = "DP",
-  MaxItr = 20)
+  smooth_data = FALSE, sparam = 25, parallel = FALSE,
+  omethod = "DP", MaxItr = 20)
 }
 \arguments{
 \item{f}{matrix (\eqn{N} x \eqn{M}) of \eqn{M} functions with \eqn{N} samples}
@@ -49,9 +49,10 @@ This function aligns a collection of functions using the elastic square-root
 slope (srsf) framework.
 }
 \examples{
+\dontrun{
 data("simu_data")
-# use more iterations for accuracy
-out = time_warping(simu_data$f,simu_data$time, MaxItr=1)
+out = time_warping(simu_data$f,simu_data$time)
+}
 }
 \references{
 Srivastava, A., Wu, W., Kurtek, S., Klassen, E., Marron, J. S.,

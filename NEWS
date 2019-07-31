@@ -1,5 +1,18 @@
-fdasrvf 1.8.3
+fdasrvf 1.9.2
 --------------
+v1.9.2
+* update gropt library
+
+v1.9.1
+* Added tolerance bound functions
+
+v1.9.0
+* Added elastic principal component regression functions
+
+v1.8.4
+* centered rgam calculation
+* fix bug in curve functions and image registration
+
 v1.8.3
 * added bayesian alignment method by Y. Lu et. al
 * added multiple functional alignment function
