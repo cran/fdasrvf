@@ -1,4 +1,4 @@
-/*
+﻿/*
 This file defines the class for the unit sphere in tangent space of a given manifold at a point of the manifold.
 
 Manifold --> SphereTx
