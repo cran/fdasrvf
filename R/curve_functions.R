@@ -72,6 +72,7 @@ calculate_variance <- function(beta){
 
 
 psi <- function(x, a, q){
+  # not used
     T1 = ncol(q)
     dim(a) = c(length(a),1)
     covmat = calculate_variance(x+repmat(a,1,T1))
@@ -83,35 +84,31 @@ psi <- function(x, a, q){
     return(list(psi1=psi1,psi2=psi2,psi3=psi3,psi4=psi4))
 }
 
-
-find_basis_normal <- function(q){
-    n = nrow(q)
-    T1 = ncol(q)
-
-    f1 = matrix(0,n,T1)
-    f2 = matrix(0,n,T1)
-    for (i in 1:T1){
-        f1[,i] = q[1,i]*q[,i]/pvecnorm(q[,i])+c(pvecnorm(q[,i]),0)
-        f2[,i] = q[2,i]*q[,i]/pvecnorm(q[,i])+c(0,pvecnorm(q[,i]))
+find_basis_normal <- function (q) {
+  n = nrow(q)
+  T1 = ncol(q)
+  basis <- list(NULL)
+  for (j in 1:n) {
+    ff = matrix(0, n, T1)
+    for (i in 1:T1) {
+      pvn <- c(rep(0,j-1), pvecnorm(q[, i]), rep(0,n-j))
+      ff[, i] = q[j, i] * q[, i]/pvecnorm(q[, i]) + pvn
     }
-    h3 = f1
-    h4 = f2
-    integrandb3 = rep(0,T1)
-    integrandb4 = rep(0,T1)
-    for (i in 1:T1){
-        integrandb3[i] = t(q[,i])%*%h3[,i]
-        integrandb4[i] = t(q[,i])%*%h4[,i]
+    hh = ff
+    integrandbb = rep(0, T1)
+    for (i in 1:T1) {
+      integrandbb[i] = t(q[, i]) %*% hh[, i]
     }
-    b3 = h3 - q*trapz(seq(0,1,length.out=T1),integrandb3)
-    b4 = h4 - q*trapz(seq(0,1,length.out=T1),integrandb4)
-
-    basis = list(b3,b4)
-
-    return(basis)
+    bb = hh - q * trapz(seq(0, 1, length.out = T1), integrandbb)
+    basis[[j]] <- bb
+  }
+  return(basis)
 }
 
 
+
 calc_j <- function(basis){
+  # not used
     b1 = basis[[1]]
     b2 = basis[[2]]
     T1 = ncol(b1)
@@ -233,7 +230,7 @@ project_curve <- function(q){
       dt = 0.35
     }
 
-    if (n==3) {
+    if (n>=3) {
       dt = 0.2
     }
 
@@ -298,6 +295,7 @@ project_curve <- function(q){
 
 
 pre_proc_curve <- function(beta, T1=100){
+  # not used
     beta = resamplecurve(beta,T1)
     q = curve_to_q(beta)
     qnew = project_curve(q)
@@ -371,7 +369,9 @@ inverse_exp_coord <- function(beta1, beta2, mode="O", rotated=T){
 
 
 inverse_exp <- function(q1, q2, beta2){
+  # this function is not used
     T1 = ncol(q1)
+    n <- nrow(q1)
     centroid1 = calculatecentroid(beta2)
     dim(centroid1) = c(length(centroid1),1)
     beta2 = beta2 - repmat(centroid1, 1, T1)
@@ -407,37 +407,34 @@ inverse_exp <- function(q1, q2, beta2){
     if (normu > 1e-4){
         v = u*acos(q1dotq2)/normu
     } else {
-        v = matrix(0, 2, T1)
+        v = matrix(0, n, T1)
     }
 
     return(v)
 }
 
 
-
-gram_schmidt <- function(basis){
-    b1 = basis[[1]]
-    b2 = basis[[2]]
-
-    basis1 = b1 / sqrt(innerprod_q2(b1,b1))
-    b2 = b2 - innerprod_q2(basis1,b2)*basis1
-    basis2 = b2 / sqrt(innerprod_q2(b2,b2))
-
-    basis_o = list(basis1, basis2)
-
-    return(basis_o)
+gram_schmidt <- function (basis) {
+  n <- length(basis)
+  for(i in 1:n){
+    bb <- basis[[i]]
+    if(i>1) for(j in i:1){
+      bb <- bb - innerprod_q2(basis[[j]], bb) * basis[[j]]
+    }
+    basis[[i]] <- bb/sqrt(innerprod_q2(bb, bb))
+  }
+  return(basis)
 }
 
-
-project_tangent <- function(w, q, basis){
-    w = w - innerprod_q2(w,q)*q
-    bo = gram_schmidt(basis)
-
-    wproj = w - innerprod_q2(w, bo[[1]])*bo[[1]] - innerprod_q2(w,bo[[2]])*bo[[2]]
-
-    return(wproj)
+project_tangent <- function (w, q, basis) 
+{
+  nb <- length(basis)
+  w = w - innerprod_q2(w, q) * q
+  bo = gram_schmidt(basis)
+  wproj <- w
+  for(i in 1:nb) wproj <- wproj - innerprod_q2(w, bo[[i]]) * bo[[i]]
+  return(wproj)
 }
-
 
 scale_curve <- function(beta){
     n = nrow(beta)
@@ -456,26 +453,27 @@ scale_curve <- function(beta){
     return(list(beta_scaled=beta_scaled, scale=scale))
 }
 
-
-parallel_translate <- function(w, q1, q2, basis, mode='O'){
-    wtilde = w - 2*innerprod_q2(w,q2) / innerprod_q2(q1+q2,q1+q2) * (q1+q2)
-    l = sqrt(innerprod_q2(wtilde, wtilde))
-
-    if (mode == 'C'){
-        wbar = project_tangent(wtilde, q2, basis)
-        normwbar = sqrt(innerprod_q2(wbar, wbar))
-        if (normwbar>1e-4){
-            wbar = wbar * l / normwbar
-        }
-    } else {
-        wbar = wtilde
+parallel_translate <- function (w, q1, q2, basis, mode = "O") 
+{
+  wtilde = w - 2 * innerprod_q2(w, q2)/innerprod_q2(q1 + q2, q1 + q2) * (q1 + q2)
+  l = sqrt(innerprod_q2(wtilde, wtilde))
+  if (mode == "C") {
+    wbar = project_tangent(wtilde, q2, basis)
+    normwbar = sqrt(innerprod_q2(wbar, wbar))
+    if (normwbar > 1e-04) {
+      wbar = wbar * l/normwbar
     }
-
-    return(wbar)
+  }
+  else {
+    wbar = wtilde
+  }
+  return(wbar)
 }
 
 
+
 rot_mat <- function(theta){
+  # not used
     O = matrix(0,2,2)
     O[1,1] = cos(theta)
     O[1,2] = -1*sin(theta)

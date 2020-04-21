@@ -1,9 +1,9 @@
 Package: fdasrvf
 Type: Package
 Title: Elastic Functional Data Analysis
-Version: 1.9.3
-Date: 2020-02-11
-Author: J. Derek Tucker <jdtuck@sandia.gov>
+Version: 1.9.4
+Date: 2020-04-20
+Author: J. Derek Tucker <jdtuck@sandia.gov>, Joerg Polzehl [ctb]
 Maintainer: J. Derek Tucker <jdtuck@sandia.gov>
 Description: Performs alignment, PCA, and modeling of multidimensional and
             unidimensional functions using the square-root velocity framework
