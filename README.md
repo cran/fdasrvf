@@ -3,6 +3,7 @@ fdasrvf
 *R library for elastic functional data analysis*
 
 [![Build Status](https://img.shields.io/travis/jdtuck/fdasrvf_R.svg?style=flat-square&label=linux)](https://travis-ci.org/jdtuck/fdasrvf_R)
+[![codecov](https://codecov.io/gh/jdtuck/fdasrvf_R/branch/master/graph/badge.svg)](https://codecov.io/gh/jdtuck/fdasrvf_R)
 [![Build status](https://img.shields.io/appveyor/ci/jdtuck/fdasrvf-r.svg?style=flat-square&label=windows)](https://ci.appveyor.com/project/jdtuck/fdasrvf-r/branch/master)
 
 A R package for functional data analysis using the square root
@@ -12,15 +13,16 @@ analysis
 
 ### Installation
 ------------------------------------------------------------------------------
-v1.9.2 is on [CRAN](https://cran.r-project.org/package=fdasrvf)
+v1.9.3 is on [CRAN](https://cran.r-project.org/package=fdasrvf)
 and can be installed as
 > `install.packages("fdasrvf")`
 
 
 For a more up to date, but may not be stable version from git repository
+This version has RBFGS while CRAN does not.
 
 1. Download zip or tar.gz of package or clone repository
-2. Install into R (> 3.1.0)
+2. Install into R (> 3.5.0)
 
 > `install.packages("fdasrvf.tar.gz", repos = NULL)`
 
@@ -80,3 +82,4 @@ J. D. Tucker, J. R. Lewis, and A. Srivastava, “Elastic Functional Principal Co
 
 J. D. Tucker, J. R. Lewis, C. King, and S. Kurtek, “A Geometric Approach for Computing Tolerance Bounds for Elastic Functional Data,” Journal of Applied Statistics, 10.1080/02664763.2019.1645818, 2019.
 
+T. Harris, J. D. Tucker, B. Li, and L. Shand, "Elastic depths for detecting shape anomalies in functional data," Technometrics, 10.1080/00401706.2020.1811156, 2020.
