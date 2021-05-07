@@ -1,8 +1,8 @@
 Package: fdasrvf
 Type: Package
 Title: Elastic Functional Data Analysis
-Version: 1.9.4
-Date: 2020-10-09
+Version: 1.9.6
+Date: 2021-5-07
 Author: J. Derek Tucker <jdtuck@sandia.gov>
 Maintainer: J. Derek Tucker <jdtuck@sandia.gov>
 Description: Performs alignment, PCA, and modeling of multidimensional and
@@ -15,13 +15,14 @@ License: GPL-3
 LazyData: TRUE
 SystemRequirements: C++11
 Imports: Rcpp (>= 0.12.1), coda, foreach, mvtnorm, matrixcalc, splines,
-        parallel, fields, doParallel, viridisLite, tolerance, testthat
+        parallel, fields, doParallel, viridisLite, tolerance, lpSolve,
+        Matrix, testthat
 Suggests: akima, plot3D, plot3Drgl, rgl
 LinkingTo: Rcpp, RcppArmadillo
 Depends: R (>= 3.5.0),
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 NeedsCompilation: yes
-Packaged: 2020-10-09 18:16:45 UTC; jdtuck
+Packaged: 2021-05-07 15:23:06 UTC; jdtuck
 Repository: CRAN
-Date/Publication: 2020-10-09 19:20:02 UTC
+Date/Publication: 2021-05-07 16:10:03 UTC

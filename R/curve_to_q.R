@@ -9,7 +9,7 @@
 #' @export
 #' @examples
 #' data("mpeg7")
-#' q = curve_to_q(beta[,,1,1])
+#' q = curve_to_q(beta[,,1,1])$q
 curve_to_q <- function(beta){
     n = nrow(beta)
     T1 = ncol(beta)
@@ -17,6 +17,7 @@ curve_to_q <- function(beta){
     v = t(v)
 
     q = matrix(0,n,T1)
+    len = sqrt(innerprod_q2(v, v))
     for (i in 1:T1){
         L = sqrt(pvecnorm(v[,i],2))
         if (L>0.0001){
@@ -26,7 +27,8 @@ curve_to_q <- function(beta){
         }
     }
 
-    #q = q/sqrt(innerprod_q2(q, q))
+    len_q = sqrt(innerprod_q2(q, q))
+    q = q/len_q
 
-    return(q)
+    return(list(q=q,len=len,lenq=len_q))
 }

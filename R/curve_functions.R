@@ -20,8 +20,7 @@ calculatecentroid <- function(beta){
 
 innerprod_q2 <- function(q1, q2){
     T1 = ncol(q1)
-    val = trapz(seq(0,1,length.out=T1),colSums(q1*q2))
-
+    val = sum(q1*q2)/T1
     return(val)
 }
 
@@ -35,7 +34,7 @@ find_best_rotation <- function(q1, q2){
     s = out$d
     U = out$u
     V = out$v
-    if (abs(det(U)*det(V)-1) < (10*eps)){
+    if (det(A)>0){
         S = diag(1,n)
     } else {
         S = diag(1,n)
@@ -140,9 +139,16 @@ shift_f <- function(f, tau){
     n = nrow(f)
     T1 = ncol(f)
     fn = matrix(0, n, T1)
-    fn[,1:(T1-1)] = circshift(f[,1:(T1-1)], c(0,tau))
-    fn[,T1] = fn[,1]
-
+    if (tau > 0){
+        fn[,1:(T1-tau)] = f[,(tau+1):T1]
+        fn[,(T1-tau+1):T1] = f[,1:tau]
+    } else if (tau ==0) {
+      fn = f
+    } else {
+        t = abs(tau)+1
+        fn[,1:(T1-t+1)] = f[,(t):T1]
+        fn[,(T1-t+2):T1] = f[,1:(t-1)]
+    }
     return(fn)
 }
 
@@ -150,27 +156,126 @@ shift_f <- function(f, tau){
 find_rotation_seed_coord <- function(beta1, beta2, mode="O"){
     n = nrow(beta1)
     T1 = ncol(beta1)
-    q1 = curve_to_q(beta1)
-    Ltwo = rep(0,T1)
-    Rlist = array(0,c(n,n,T1))
-    for (ctr in 1:T1){
-        beta2n = shift_f(beta2, ctr)
-        out = find_best_rotation(beta1, beta2n)
-        q2new = curve_to_q(out$q2new)
-        Ltwo[ctr] = innerprod_q2(q1-q2new,q1-q2new)
-        Rlist[,,ctr] = out$R
+    q1 = curve_to_q(beta1)$q
+    
+    scl = 4
+    minE = 1000
+    if (mode=="C"){
+        end_idx = floor(T1/scl)
+    } else {
+        end_idx = 0
     }
 
-    tau = which.min(Ltwo)
-    O_hat = Rlist[,,tau]
-    if (mode=="C")
-      beta2new = shift_f(beta2,tau)
-    else
-      beta2new = beta2
+    for (ctr in 0:end_idx){
+        if (mode=="C"){
+            beta2n = shift_f(beta2, scl*ctr)
+        } else {
+            beta2n = beta2
+        } 
+        out = find_best_rotation(beta1, beta2n)
+        beta2n = out$q2new
+        q2n = curve_to_q(beta2n)$q
 
-    beta2new = O_hat %*% beta2new
+        if (norm(q1-q2n,'F') > 0.0001){
+            q1 = q1/sqrt(innerprod_q2(q1, q1))
+            q2n = q2n/sqrt(innerprod_q2(q2n, q2n))
+            q1i = q1
+            dim(q1i) = c(T1*n)
+            q2i = q2n
+            dim(q2i) = c(T1*n)
+            gam0 = .Call('DPQ', PACKAGE = 'fdasrvf', q1i, q2i, n, T1, 0, 0, rep(0,T1))
+            gamI = invertGamma(gam0)
+            gam = (gamI-gamI[1])/(gamI[length(gamI)]-gamI[1])
+            beta2n = q_to_curve(q2n)
+            beta2new = group_action_by_gamma_coord(beta2n, gam)
+            q2new = curve_to_q(beta2new)$q
+            if (mode=="C"){
+                q2new = project_curve(q2new)
+            }
+        } else{
+            q2new = q2n
+            beta2new = beta2n
+            gam = seq(0,1,length.out=T1)
+        }
+        dist = innerprod_q2(q1,q2new)
+        if (dist < -1){
+            dist = -1
+        }
+        if (dist > 1){
+            dist = 1
+        }
+        Ec = acos(dist)
+        if (Ec < minE){
+            Rbest = out$R
+            beta2best = beta2new
+            q2best = q2new
+            gambest = gam
+            minE = Ec
+            tau = scl*ctr
+        }
+    }
 
-    return(list(beta2new=beta2new,O_hat=O_hat,tau=tau))
+    return(list(beta2best=beta2best,q2best=q2best,Rbest=Rbest,gambest=gambest,tau=tau))
+}
+
+
+find_rotation_seed_unqiue <- function(q1, q2, mode="O"){
+    n1 = nrow(q1)
+    T1 = ncol(q1)
+    scl = 4
+    minE = 1000
+    if (mode=="C"){
+        end_idx = floor(T1/scl)
+    } else {
+        end_idx = 0
+    }
+
+    for (ctr in 0:end_idx){
+        if (mode=="C"){
+            q2n = shift_f(q2, scl*ctr)
+        } else {
+            q2n = q2
+        } 
+        out = find_best_rotation(q1, q2n)
+        q2n = out$q2new
+
+        if (norm(q1-q2n,'F') > 0.0001){
+            q1 = q1/sqrt(innerprod_q2(q1, q1))
+            q2n = q2n/sqrt(innerprod_q2(q2n, q2n))
+            q1i = q1
+            dim(q1i) = c(T1*n1)
+            q2i = q2n
+            dim(q2i) = c(T1*n1)
+            gam0 = .Call('DPQ', PACKAGE = 'fdasrvf', q1i, q2i, n1, T1, 0, 0, rep(0,T1))
+            gamI = invertGamma(gam0)
+            gam = (gamI-gamI[1])/(gamI[length(gamI)]-gamI[1])
+            beta2n = q_to_curve(q2n)
+            beta2new = group_action_by_gamma_coord(beta2n, gam)
+            q2new = curve_to_q(beta2new)$q
+            if (mode=="C"){
+                q2new = project_curve(q2new)
+            }
+        } else{
+            q2new = q2n
+            gam = seq(0,1,length.out=T1)
+        }
+        dist = innerprod_q2(q1,q2new)
+        if (dist < -1){
+            dist = -1
+        }
+        if (dist > 1){
+            dist = 1
+        }
+        Ec = acos(dist)
+        if (Ec < minE){
+            Rbest = out$R
+            q2best = q2new
+            gambest = gam
+            minE = Ec
+        }
+    }
+
+    return(list(q2best=q2best,Rbest=Rbest,gambest=gambest))
 }
 
 
@@ -299,7 +404,7 @@ project_curve <- function(q){
 
 pre_proc_curve <- function(beta, T1=100){
     beta = resamplecurve(beta,T1)
-    q = curve_to_q(beta)
+    q = curve_to_q(beta)$q
     qnew = project_curve(q)
     x = q_to_curve(qnew)
     a = -1*calculatecentroid(x)
@@ -320,7 +425,7 @@ inverse_exp_coord <- function(beta1, beta2, mode="O", rotated=T){
     dim(centroid2) = c(length(centroid2),1)
     beta2 = beta2 - repmat(centroid2, 1, T1)
 
-    q1 = curve_to_q(beta1)
+    q1 = curve_to_q(beta1)$q
 
     if (mode=="C"){
       isclosed = TRUE
@@ -338,9 +443,9 @@ inverse_exp_coord <- function(beta1, beta2, mode="O", rotated=T){
     beta2 = group_action_by_gamma_coord(beta2, gamI)
     if (rotated){
       out = find_rotation_seed_coord(beta1, beta2, mode)
-      q2n = curve_to_q(out$beta2new)
+      q2n = curve_to_q(out$beta2new)$q
     } else {
-      q2n = curve_to_q(beta2)
+      q2n = curve_to_q(beta2)$q
     }
 
 
@@ -387,7 +492,7 @@ inverse_exp <- function(q1, q2, beta2){
 
     # Applying optimal re-parameterization to the second curve
     beta2 = group_action_by_gamma_coord(beta2, gamI)
-    q2 = curve_to_q(beta2)
+    q2 = curve_to_q(beta2)$q
 
     # Optimize over SO(n)
     out = find_rotation_and_seed_q(q1, q2)
@@ -412,7 +517,6 @@ inverse_exp <- function(q1, q2, beta2){
 
     return(v)
 }
-
 
 
 gram_schmidt <- function(basis){
@@ -501,4 +605,19 @@ karcher_calc <- function(beta, q, betamean, mu, rotated=T, mode="O"){
     }
 
     return(list(v=v,d=out$dist,gam=out$gam))
+}
+
+
+elastic_shooting <- function(q1, v,mode="O"){
+    d = sqrt(innerprod_q2(v,v))
+    if (d < 0.00001){
+        q2n = q1
+    } else {
+        q2n = cos(d)*q1 + (sin(d)/d)*v
+        if (mode == "C"){
+        q2n = project_curve(q2n)
+      }
+    }
+
+    return(q2n)
 }

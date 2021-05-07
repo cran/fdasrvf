@@ -4,7 +4,14 @@
 \alias{curve_srvf_align}
 \title{Align Curves}
 \usage{
-curve_srvf_align(beta, mode = "O", rotated = T, maxit = 20)
+curve_srvf_align(
+  beta,
+  mode = "O",
+  rotated = T,
+  scale = F,
+  maxit = 20,
+  ms = "mean"
+)
 }
 \arguments{
 \item{beta}{array (n,T,N) for N number of curves}
@@ -13,7 +20,11 @@ curve_srvf_align(beta, mode = "O", rotated = T, maxit = 20)
 
 \item{rotated}{Optimize over rotation (default = T)}
 
+\item{scale}{Include scale (default = F)}
+
 \item{maxit}{maximum number of iterations}
+
+\item{ms}{string defining whether the Karcher mean ("mean") or Karcher median ("median") is returned (default = "mean")}
 }
 \value{
 Returns a list containing \item{betan}{aligned curves}
@@ -27,7 +38,6 @@ Aligns a collection of curves using the elastic square-root velocity (srvf) fram
 \examples{
 data("mpeg7")
 out = curve_srvf_align(beta[,,1,1:2],maxit=2) # note: use more shapes, small for speed
-K = curve_karcher_cov(out$betamean, beta[,,1,1:2])
 }
 \references{
 Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape analysis of elastic curves in euclidean spaces. Pattern Analysis and Machine Intelligence, IEEE Transactions on 33 (7), 1415-1428.

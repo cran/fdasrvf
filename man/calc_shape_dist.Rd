@@ -4,7 +4,7 @@
 \alias{calc_shape_dist}
 \title{Elastic Shape Distance}
 \usage{
-calc_shape_dist(beta1, beta2, mode = "O")
+calc_shape_dist(beta1, beta2, mode = "O", scale = F)
 }
 \arguments{
 \item{beta1}{array describing curve1 (n,T)}
@@ -12,19 +12,21 @@ calc_shape_dist(beta1, beta2, mode = "O")
 \item{beta2}{array describing curve}
 
 \item{mode}{Open ("O") or Closed ("C") curves}
+
+\item{scale}{Include scale (default =F)}
 }
 \value{
-d geodesic distance
+Returns a list containing \item{d}{geodesic distance}
+\item{dx}{phase distance}
 }
 \description{
 Calculate elastic shape distance between two curves beta1 and beta2
 }
 \examples{
 data("mpeg7")
-d = calc_shape_dist(beta[,,1,1],beta[,,1,4])
+out = calc_shape_dist(beta[,,1,1],beta[,,1,4])
 }
 \references{
 Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape analysis of elastic curves in euclidean spaces. Pattern Analysis and Machine Intelligence, IEEE Transactions on 33 (7), 1415-1428.
 }
-\keyword{alignment}
-\keyword{srvf}
+\keyword{distances}
