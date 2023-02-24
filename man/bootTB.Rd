@@ -4,7 +4,7 @@
 \alias{bootTB}
 \title{Tolerance Bound Calculation using Bootstrap Sampling}
 \usage{
-bootTB(f, time, a = 0.05, p = 0.99, B = 500, no = 5, parallel = T)
+bootTB(f, time, a = 0.05, p = 0.99, B = 500, no = 5, Nsamp = 100, parallel = T)
 }
 \arguments{
 \item{f}{matrix of functions}
@@ -19,6 +19,8 @@ bootTB(f, time, a = 0.05, p = 0.99, B = 500, no = 5, parallel = T)
 
 \item{no}{number of principal components (default = 5)}
 
+\item{Nsamp}{number of functions per bootstrap (default = 100)}
+
 \item{parallel}{enable parallel processing (default = T)}
 }
 \value{
@@ -31,21 +33,20 @@ phase and amplitude variation using bootstrap sampling
 }
 \examples{
 \dontrun{
-  data("simu_data")
-  out1 = bootTB(simu_data$f,simu_data$time)
+  out1 <- bootTB(simu_data$f, simu_data$time)
 }
 }
 \references{
-J. D. Tucker, J. R. Lewis, C. King, and S. Kurtek,
-  “A Geometric Approach for Computing Tolerance Bounds for Elastic Functional Data,”
-   Journal of Applied Statistics, 10.1080/02664763.2019.1645818, 2019.
+J. D. Tucker, J. R. Lewis, C. King, and S. Kurtek, “A Geometric
+Approach for Computing Tolerance Bounds for Elastic Functional Data,”
+Journal of Applied Statistics, 10.1080/02664763.2019.1645818, 2019.
 
-Tucker, J. D., Wu, W., Srivastava, A.,
- Generative Models for Function Data using Phase and Amplitude Separation,
- Computational Statistics and Data Analysis (2012), 10.1016/j.csda.2012.12.001.
+Tucker, J. D., Wu, W., Srivastava, A., Generative Models for
+Function Data using Phase and Amplitude Separation, Computational
+Statistics and Data Analysis (2012), 10.1016/j.csda.2012.12.001.
 
-Jung, S. L. a. S. (2016). "Combined Analysis of Amplitude and Phase Variations in Functional Data."
-       	arXiv:1603.01775 [stat.ME].
+Jung, S. L. a. S. (2016). "Combined Analysis of Amplitude and
+Phase Variations in Functional Data." arXiv:1603.01775.
 }
 \concept{bounds}
 \keyword{bootstrap}

@@ -2,9 +2,12 @@ fdasrvf
 =======
 *R library for elastic functional data analysis*
 
-[![Build Status](https://app.travis-ci.com/jdtuck/fdasrvf_R.svg?branch=master)](https://app.travis-ci.com/jdtuck/fdasrvf_R)
-[![codecov](https://codecov.io/gh/jdtuck/fdasrvf_R/branch/master/graph/badge.svg?token=92GPCN636T)](https://app.codecov.io/gh/jdtuck/fdasrvf_R)
-[![Build status](https://img.shields.io/appveyor/ci/jdtuck/fdasrvf-r.svg?style=flat-square&label=windows)](https://ci.appveyor.com/project/jdtuck/fdasrvf-r/branch/master)
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/jdtuck/fdasrvf_R/actions/workflows/check-standard.yaml/badge.svg)](https://github.com/jdtuck/fdasrvf_R/actions/workflows/check-standard.yaml)
+[![test-coverage](https://github.com/jdtuck/fdasrvf_R/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/jdtuck/fdasrvf_R/actions/workflows/test-coverage.yaml)
+[![Codecov test coverage](https://codecov.io/gh/jdtuck/fdasrvf_R/branch/master/graph/badge.svg)](https://app.codecov.io/gh/jdtuck/fdasrvf_R?branch=master)
+[![CRAN status](https://www.r-pkg.org/badges/version/fdasrvf)](https://CRAN.R-project.org/package=fdasrvf)
+<!-- badges: end -->
 
 A R package for functional data analysis using the square root
 velocity framework which performs pair-wise and group-wise
@@ -13,7 +16,7 @@ analysis
 
 ### Installation
 ------------------------------------------------------------------------------
-v1.9.8 is on [CRAN](https://cran.r-project.org/package=fdasrvf)
+v2.0.0 is on [CRAN](https://cran.r-project.org/package=fdasrvf)
 and can be installed as
 > `install.packages("fdasrvf")`
 
@@ -39,8 +42,7 @@ Huang, W. 2014, Optimization Algorithms on Riemannian Manifolds with
 Applications. Ph.D. Thesis, Florida State University.
 
 Srivastava, A., Wu, W., Kurtek, S., Klassen, E. and Marron, J. S. (2011).
-Registration of Functional Data Using Fisher-Rao Metric. arXiv:1103.3817v2
-[math.ST].
+Registration of Functional Data Using Fisher-Rao Metric. arXiv:1103.3817v2.
 
 Tucker, J. D., Wu, W. and Srivastava, A. (2013). Generative models for
 functional data using phase and amplitude separation. Computational Statistics
@@ -76,10 +78,14 @@ of variability in functional data, Journal of American Statistical Association 1
 Lu, Y., R. Herbei, and S. Kurtek, 2017: Bayesian registration of functions with a Gaussian process prior. Journal of
 Computational and Graphical Statistics, 26, no. 4, 894–904.
 
-Lee, S. and S. Jung, 2017: Combined analysis of amplitude and phase variations in functional data. arXiv:1603.01775 [stat.ME], 1–21.
+Lee, S. and S. Jung, 2017: Combined analysis of amplitude and phase variations in functional data. arXiv:1603.01775, 1–21.
 
 J. D. Tucker, J. R. Lewis, and A. Srivastava, “Elastic Functional Principal Component Regression,” Statistical Analysis and Data Mining, vol. 12, no. 2, pp. 101-115, 2019.
 
 J. D. Tucker, J. R. Lewis, C. King, and S. Kurtek, “A Geometric Approach for Computing Tolerance Bounds for Elastic Functional Data,” Journal of Applied Statistics, 10.1080/02664763.2019.1645818, 2019.
 
 T. Harris, J. D. Tucker, B. Li, and L. Shand, "Elastic depths for detecting shape anomalies in functional data," Technometrics, 10.1080/00401706.2020.1811156, 2020.
+
+Q. Xie, S. Kurtek, E. Klassen, G. E. Christensen and A. Srivastava. Metric-based pairwise and multiple image registration. IEEE European Conference on Computer Vision (ECCV), September, 2014
+
+X. Zhang, S. Kurtek, O. Chkrebtii, and J. D. Tucker, “Elastic kkk-means clustering of functional data for posterior exploration, with an application to inference on acute respiratory infection dynamics”, arXiv:2011.12397 [stat.ME], 2020 arxiv

@@ -4,7 +4,7 @@
 \alias{elastic.depth}
 \title{Calculates elastic depth}
 \usage{
-elastic.depth(f, time, lambda = 0, parallel = FALSE)
+elastic.depth(f, time, lambda = 0, pen = "roughness", parallel = FALSE)
 }
 \arguments{
 \item{f}{matrix of N function of M time points (MxN)}
@@ -12,6 +12,10 @@ elastic.depth(f, time, lambda = 0, parallel = FALSE)
 \item{time}{sample points of functions}
 
 \item{lambda}{controls amount of warping (default = 0)}
+
+\item{pen}{alignment penalty (default="roughness") options are
+second derivative ("roughness"), geodesic distance from id ("geodesic"), and
+norm from id ("norm")}
 
 \item{parallel}{run computation in parallel (default = T)}
 }
@@ -23,8 +27,7 @@ Returns a list containing \item{amp}{amplitude depth}
 This functions calculates the elastic depth between set of functions
 }
 \examples{
-data("simu_data")
-depths <- elastic.depth(simu_data$f[,1:4],simu_data$time)
+depths <- elastic.depth(simu_data$f[, 1:4], simu_data$time)
 }
 \references{
 T. Harris, J. D. Tucker, B. Li, and L. Shand, "Elastic depths for detecting shape anomalies in functional data," Technometrics, 10.1080/00401706.2020.1811156, 2020.

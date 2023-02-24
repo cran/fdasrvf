@@ -7,11 +7,14 @@
 #' @param time vector of size \eqn{N} describing the sample points
 #' @param mu vector of size \eqn{N} that f is aligned to
 #' @param lambda controls the elasticity (default = 0)
+#' @param pen alignment penalty (default="roughness") options are 
+#' second derivative ("roughness"), geodesic distance from id ("geodesic"), and 
+#' norm from id ("norm")
 #' @param showplot shows plots of functions (default = T)
 #' @param smooth_data smooth data using box filter (default = F)
 #' @param sparam number of times to apply box filter (default = 25)
-#' @param parallel enable parallel mode using \code{\link{foreach}} and
-#'   \code{doParallel} package (default=F)
+#' @param parallel enable parallel mode using [foreach()] and
+#'   `doParallel` package (default=F)
 #' @param omethod optimization method (DP,DP2,RBFGS,dBayes,expBayes)
 #' @param MaxItr maximum number of iterations
 #' @param iter bayesian number of mcmc samples (default 2000)
@@ -29,12 +32,12 @@
 #' @keywords srsf alignment
 #' @references Srivastava, A., Wu, W., Kurtek, S., Klassen, E., Marron, J. S.,
 #'  May 2011. Registration of functional data using fisher-rao metric,
-#'  arXiv:1103.3817v2 [math.ST].
+#'  arXiv:1103.3817v2.
 #' @references Tucker, J. D., Wu, W., Srivastava, A.,
 #'  Generative Models for Function Data using Phase and Amplitude Separation,
 #'  Computational Statistics and Data Analysis (2012), 10.1016/j.csda.2012.12.001.
 #' @export
-multiple_align_functions <- function(f, time, mu, lambda = 0,
+multiple_align_functions <- function(f, time, mu, lambda = 0, pen="roughness", 
                                      showplot = TRUE, smooth_data = FALSE, sparam = 25,
                                      parallel = FALSE, omethod = "DP", MaxItr = 20, iter=2000){
   if (parallel){
@@ -82,7 +85,7 @@ multiple_align_functions <- function(f, time, mu, lambda = 0,
     } else if (omethod=="dBayes") {
       gam <- pair_align_functions_bayes(mu, f[,k], time)$gam_a
     } else {
-      gam <- optimum.reparam(mq,time,q[,k],time,lambda,omethod,w,mf[1],f[1,k])
+      gam <- optimum.reparam(mq,time,q[,k],time,lambda,pen,omethod,w,mf[1],f[1,k])
     }
 
     gam_dev = gradient(gam,1/(M-1))
