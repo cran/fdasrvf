@@ -9,7 +9,7 @@ plot.fdawarp <- function(x, ...){
 
   graphics::matplot(
     x = (0:(M - 1)) / (M - 1),
-    y = x$gam,
+    y = x$warping_functions,
     type = "l",
     main = "Warping functions",
     xlab = "Time"
@@ -59,13 +59,13 @@ plot.fdawarp <- function(x, ...){
     lty = 1
   )
 
-  if (x$method == "mean")
+  if (x$call$centroid_type == "mean")
     plot(
       x = x$time,
       y = x$fmean,
       type = "l",
       col = "green",
-      main = bquote(paste(f[mean], " (", lambda == .(x$lambda), ")"))
+      main = bquote(paste(f[mean], " (", lambda == .(x$call$lambda), ")"))
     )
   else
     plot(
@@ -73,6 +73,6 @@ plot.fdawarp <- function(x, ...){
       y = x$fmean,
       type = "l",
       col = "green",
-      main = bquote(paste(f[median], " (", lambda == .(x$lambda), ")"))
+      main = bquote(paste(f[median], " (", lambda == .(x$call$lambda), ")"))
     )
 }

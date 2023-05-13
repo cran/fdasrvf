@@ -1,3 +1,12 @@
+# fdasrvf 2.0.2.900
+
+# fdasrvf 2.0.2
+
+* added dynamic grid to DP method (#25)
+* update outputs to curve functions (#26)
+* extend exp_map to n-d curves (#27)
+* bugfixes
+
 # fdasrvf 2.0.1
 
 * Added functionalities to `kmeans_align()` (#24). Specifically:
