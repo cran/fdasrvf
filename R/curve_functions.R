@@ -2,16 +2,16 @@
 calculatecentroid <- function(beta,returnlength = F){
   n = nrow(beta)
   T1 = ncol(beta)
-  
+
   betadot = apply(beta,1,gradient,1.0/(T1-1))
   betadot = t(betadot)
-  
+
   normbetadot = apply(betadot,2,pvecnorm,2)
   integrand = matrix(0, n, T1)
   for (i in 1:T1){
     integrand[,i] = beta[,i] * normbetadot[i]
   }
-  
+
   scale = trapz(seq(0,1,length.out=T1), normbetadot)
   centroid = apply(integrand,1,trapz,x = seq(0,1,length.out=T1))/scale
   if(returnlength)  return(list("length" = scale,"centroid" = centroid))
@@ -169,7 +169,11 @@ find_rotation_seed_coord <- function(beta1, beta2, mode="O"){
 
     for (ctr in 0:end_idx){
         if (mode=="C"){
-            beta2n = shift_f(beta2, scl*ctr)
+            if ((scl*ctr) <= end_idx){
+              beta2n = shift_f(beta2, scl*ctr)
+            } else {
+              break
+            }
         } else {
             beta2n = beta2
         }
@@ -220,7 +224,7 @@ find_rotation_seed_coord <- function(beta1, beta2, mode="O"){
 }
 
 
-find_rotation_seed_unqiue <- function(q1, q2, mode="O"){
+find_rotation_seed_unqiue <- function(q1, q2, mode="O", lam=0.0){
     n1 = nrow(q1)
     T1 = ncol(q1)
     scl = 4
@@ -247,7 +251,7 @@ find_rotation_seed_unqiue <- function(q1, q2, mode="O"){
             dim(q1i) = c(T1*n1)
             q2i = q2n
             dim(q2i) = c(T1*n1)
-            gam0 = .Call('DPQ', PACKAGE = 'fdasrvf', q1i, q2i, n1, T1, 0, 1, 0, rep(0,T1))
+            gam0 = .Call('DPQ', PACKAGE = 'fdasrvf', q1i, q2i, n1, T1, lam, 1, 0, rep(0,T1))
             gamI = invertGamma(gam0)
             gam = (gamI-gamI[1])/(gamI[length(gamI)]-gamI[1])
             beta2n = q_to_curve(q2n)
