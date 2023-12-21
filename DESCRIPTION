@@ -1,8 +1,8 @@
 Package: fdasrvf
 Type: Package
 Title: Elastic Functional Data Analysis
-Version: 2.1.1
-Date: 2023-12-15
+Version: 2.1.2
+Date: 2023-12-20
 Authors@R: c(
     person(given = "J. Derek", 
            family = "Tucker", 
@@ -33,9 +33,9 @@ LinkingTo: Rcpp, RcppArmadillo
 URL: https://github.com/jdtuck/fdasrvf_R
 BugReports: https://github.com/jdtuck/fdasrvf_R/issues
 NeedsCompilation: yes
-Packaged: 2023-12-16 02:09:00 UTC; jdtuck
+Packaged: 2023-12-21 11:15:05 UTC; jdtuck
 Author: J. Derek Tucker [aut, cre] (<https://orcid.org/0000-0001-8844-2169>),
   Aymeric Stamm [ctb] (<https://orcid.org/0000-0002-8725-3654>)
 Maintainer: J. Derek Tucker <jdtuck@sandia.gov>
 Repository: CRAN
-Date/Publication: 2023-12-16 05:10:04 UTC
+Date/Publication: 2023-12-21 12:00:04 UTC
