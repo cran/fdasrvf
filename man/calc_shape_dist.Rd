@@ -4,28 +4,52 @@
 \alias{calc_shape_dist}
 \title{Elastic Shape Distance}
 \usage{
-calc_shape_dist(beta1, beta2, mode = "O", scale = F)
+calc_shape_dist(
+  beta1,
+  beta2,
+  mode = "O",
+  rotation = TRUE,
+  scale = TRUE,
+  include.length = FALSE
+)
 }
 \arguments{
-\item{beta1}{array describing curve1 (n,T)}
+\item{beta1}{curve1, provided as a matrix of sizes \eqn{n\times T} for
+\eqn{n}-dimensional curve on \eqn{T} sample points}
 
-\item{beta2}{array describing curve}
+\item{beta2}{curve 2, provided as a matrix of sizes \eqn{n\times T} for
+\eqn{n}-dimensional curve on \eqn{T} sample points}
 
-\item{mode}{Open ("O") or Closed ("C") curves}
+\item{mode}{Open (\code{"O"}) or Closed (\code{"C"}) curves}
 
-\item{scale}{Include scale (default =F)}
+\item{rotation}{Include rotation (default = \code{TRUE})}
+
+\item{scale}{scale curves to unit length (default = \code{TRUE})}
+
+\item{include.length}{include length in distance calculation (default = \code{FALSE})
+this only applies if \code{scale=TRUE}}
 }
 \value{
 Returns a list containing \item{d}{geodesic distance}
 \item{dx}{phase distance}
+\item{q1}{srvf of curve 1}
+\item{q2n}{srvf of aligned curve 2}
 }
 \description{
-Calculate elastic shape distance between two curves beta1 and beta2
+Calculate elastic shape distance between two curves beta1 and beta2. If the
+curves beta1 and beta2 are describing multidimensional functional data, then
+\code{rotation == FALSE} and \code{mode == 'O'}
 }
 \examples{
 out <- calc_shape_dist(beta[, , 1, 1], beta[, , 1, 4])
 }
 \references{
-Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape analysis of elastic curves in euclidean spaces. Pattern Analysis and Machine Intelligence, IEEE Transactions on 33 (7), 1415-1428.
+Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape
+analysis of elastic curves in euclidean spaces. Pattern Analysis and Machine
+Intelligence, IEEE Transactions on 33 (7), 1415-1428.
+
+Kurtek, S., Srivastava, A., Klassen, E., and Ding, Z. (2012),
+“Statistical Modeling of Curves Using Shapes and Related Features,” Journal
+of the American Statistical Association, 107, 1152–1165.
 }
 \keyword{distances}

@@ -16,7 +16,7 @@ analysis
 
 ### Installation
 ------------------------------------------------------------------------------
-v2.1.2 is on [CRAN](https://cran.r-project.org/package=fdasrvf)
+v2.2.0 is on [CRAN](https://cran.r-project.org/package=fdasrvf)
 and can be installed as
 > `install.packages("fdasrvf")`
 
@@ -25,7 +25,7 @@ For a more up to date, but may not be stable version from git repository.
 This version has RBFGS while CRAN does not.
 
 1. Download zip or tar.gz of package or clone repository
-2. Install into R (> 4.1.0)
+2. Install into R (> 4.3.0)
 
 > `install.packages("fdasrvf.tar.gz", repos = NULL)`
 
@@ -63,6 +63,10 @@ IEEE Transactions on 33 (7), 1415-1428.
 S. Kurtek, A. Srivastava, and W. Wu. Signal estimation under random
 time-warpings and nonlinear signal alignment. In Proceedings of Neural
 Information Processing Systems (NIPS), 2011.
+
+Kurtek, S., Srivastava, A., Klassen, E., and Ding, Z. (2012), “Statistical 
+Modeling of Curves Using Shapes and Related Features,” Journal of the American
+Statistical Association, 107, 1152–1165.
 
 Wen Huang, Kyle A. Gallivan, Anuj Srivastava, Pierre-Antoine Absil. "Riemannian
 Optimization for Elastic Shape Analysis", Short version, The 21st International

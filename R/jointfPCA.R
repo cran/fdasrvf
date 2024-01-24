@@ -4,7 +4,9 @@
 #' analysis on aligned data
 #'
 #' @param warp_data fdawarp object from [time_warping] of aligned data
-#' @param no number of principal components to extract
+#' @param no number of principal components to extract (default = 3)
+#' @param var_exp compute no based on value percent variance explained (example: 0.95)
+#'                will override `no`
 #' @param id integration point for f0 (default = midpoint)
 #' @param C balance value (default = NULL)
 #' @param ci geodesic standard deviations (default = c(-1,0,1))
@@ -30,7 +32,9 @@
 #' @export
 #' @examples
 #' jfpca <- jointFPCA(simu_warp, no = 3)
-jointFPCA <- function(warp_data, no, id=round(length(warp_data$time)/2), C=NULL, ci=c(-1,0,1), showplot=T){
+jointFPCA <- function(warp_data, no=3, var_exp=NULL,
+                      id=round(length(warp_data$time)/2), C=NULL,
+                      ci=c(-1,0,1), showplot=T){
     fn <- warp_data$fn
     time <- warp_data$time
     qn <- warp_data$qn
@@ -98,18 +102,24 @@ jointFPCA <- function(warp_data, no, id=round(length(warp_data$time)/2), C=NULL,
         return(sum(d^2)/N)
     }
 
-    m <- no
+    m <- M
     if (is.null(C))
         C <- stats::optimize(findC, c(0,1e4),qn=qn1,vec=vec,q0=q0,m=m)$minimum
 
     # Final PCA ---------------------------------------------------------------
     out.pca <- jointfPCAd(qn1, vec, C, m=m)
 
+    if (!is.null(var_exp)){
+      cumm_coef <- cumsum(out.pca$s)/sum(out.pca$s)
+      tmp = which(cumm_coef <= var_exp)
+      no = tmp[length(tmp)]
+    }
+
     # geodesic paths
-    q_pca <- array(0,dim=c(M,length(ci),m))
-    f_pca <- array(0,dim=c(M,length(ci),m))
+    q_pca <- array(0,dim=c(M,length(ci),no))
+    f_pca <- array(0,dim=c(M,length(ci),no))
     N1 <- nrow(out.pca$U)
-    for (j in 1:m){
+    for (j in 1:no){
         for (i in 1:length(ci)){
             qhat <- mqn + out.pca$U[1:(M+1),j] * ci[i]*sqrt(out.pca$s[j])
             vechat <- out.pca$U[(M+2):N1,j] * (ci[i]*sqrt(out.pca$s[j]))/C
@@ -130,9 +140,9 @@ jointFPCA <- function(warp_data, no, id=round(length(warp_data$time)/2), C=NULL,
     jfpca <- list()
     jfpca$q_pca <- q_pca
     jfpca$f_pca <- f_pca
-    jfpca$latent <- out.pca$s
-    jfpca$coef <- out.pca$a
-    jfpca$U <- out.pca$U
+    jfpca$latent <- out.pca$s[1:no]
+    jfpca$coef <- out.pca$a[, 1:no]
+    jfpca$U <- out.pca$U[, 1:no]
     jfpca$mu_psi <- mu_psi
     jfpca$mu_g <- out.pca$mu_g
     jfpca$id <- id
@@ -140,6 +150,7 @@ jointFPCA <- function(warp_data, no, id=round(length(warp_data$time)/2), C=NULL,
     jfpca$time <- time
     jfpca$g <- out.pca$g
     jfpca$cov <- out.pca$cov
+    jfpca$warp_data <- warp_data
 
     class(jfpca) <- "jfpca"
 

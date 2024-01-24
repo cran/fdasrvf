@@ -2,13 +2,14 @@
 #'
 #' Calculate principal directions of a set of curves
 #'
-#' @param v array (n,T,N1) of shooting vectors
-#' @param K array (n*T,n*T) covariance matrix
-#' @param mu array (n,T) of mean srvf
-#' @param len length of original curves (default NA)
+#' @param v array of sizes \eqn{n \times T \times N1} for \eqn{N1} shooting
+#' vectors of dimension \eqn{n} evaluated on a grid of \eqn{T} points
+#' @param K matrix of sizes \eqn{nT \times nT} of covariance matrix
+#' @param mu matrix of sizes \eqn{n \times T} of mean srvf
+#' @param len length of original curves (default = `NA`)
 #' @param no number of components
 #' @param N number of samples on each side of mean
-#' @param mode Open ("O") or Closed ("C") curves
+#' @param mode Open (`"O"`) or Closed (`"C"`) curves
 #' @return Returns a list containing \item{s}{singular values}
 #' \item{U}{singular vectors}
 #' \item{coef}{principal coefficients}
@@ -21,7 +22,8 @@
 #' # note: use more shapes, small for speed
 #' K <- curve_karcher_cov(out$v)
 #' out <- curve_principal_directions(out$v, K, out$mu)
-curve_principal_directions <- function(v, K, mu, len=NA, no=3, N=5,mode="O"){
+curve_principal_directions <- function(v, K, mu, len = NA, no = 3, N = 5,
+                                       mode = "O"){
     n = nrow(mu)
     T1 = ncol(mu)
 

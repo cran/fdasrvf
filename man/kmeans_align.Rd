@@ -17,7 +17,9 @@ kmeans_align(
   sparam = 25L,
   parallel = FALSE,
   alignment = TRUE,
-  omethod = c("DP", "DP2", "RBFGS"),
+  rotation = FALSE,
+  scale = TRUE,
+  omethod = c("DP", "RBFGS"),
   max_iter = 50L,
   thresh = 0.01,
   use_verbose = FALSE
@@ -33,7 +35,10 @@ interpreted as a sample of \eqn{N} curves observed on a grid of size
 \item If a 3D array, it must be of shape \eqn{L \times M \times N} and it is
 interpreted as a sample of \eqn{N} \eqn{L}-dimensional curves observed on a
 grid of size \eqn{M}.
-}}
+}
+
+If this is multidimensional functional data, it is advised that
+\code{rotation==FALSE}}
 
 \item{time}{A numeric vector of length \eqn{M} specifying the grid on which
 the curves are evaluated.}
@@ -54,20 +59,26 @@ problem of empty clusters. Defaults to \code{0L}.}
 
 \item{lambda}{A numeric value specifying the elasticity. Defaults to \code{0.0}.}
 
-\item{showplot}{A boolean specifying whether to show plots. Defaults to
+\item{showplot}{A Boolean specifying whether to show plots. Defaults to
 \code{FALSE}.}
 
-\item{smooth_data}{A boolean specifying whether to smooth data using a box
+\item{smooth_data}{A Boolean specifying whether to smooth data using a box
 filter. Defaults to \code{FALSE}.}
 
 \item{sparam}{An integer value specifying the number of box filters applied.
 Defaults to \code{25L}.}
 
-\item{parallel}{A boolean specifying whether parallel mode (using
+\item{parallel}{A Boolean specifying whether parallel mode (using
 \code{\link[foreach:foreach]{foreach::foreach()}} and the \strong{doParallel} package) should be activated.
 Defaults to \code{FALSE}.}
 
-\item{alignment}{A boolean specifying whether to perform alignment. Defaults
+\item{alignment}{A Boolean specifying whether to perform alignment. Defaults
+to \code{TRUE}.}
+
+\item{rotation}{A Boolean specifying whether to perform rotation. Defaults to
+to \code{FALSE}.}
+
+\item{scale}{A Boolean specifying whether to scale curves to unit length. Defaults
 to \code{TRUE}.}
 
 \item{omethod}{A string specifying which method should be used to solve the
@@ -80,7 +91,7 @@ Defaults to \code{50L}.}
 \item{thresh}{A numeric value specifying a threshold on the cost function
 below which convergence is assumed. Defaults to \code{0.01}.}
 
-\item{use_verbose}{A boolean specifying whether to display information about
+\item{use_verbose}{A Boolean specifying whether to display information about
 the calculations in the console. Defaults to \code{FALSE}.}
 }
 \value{
@@ -104,7 +115,7 @@ than \code{f0} by clusters in a list;
 }
 \description{
 This function clusters functions and aligns using the elastic square-root
-slope function (SRSF) framework.
+velocity function (SRVF) framework.
 }
 \examples{
 \dontrun{

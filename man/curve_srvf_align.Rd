@@ -7,21 +7,22 @@
 curve_srvf_align(
   beta,
   mode = "O",
-  rotated = T,
-  scale = F,
+  rotated = TRUE,
+  scale = FALSE,
   lambda = 0,
   maxit = 20,
   ms = "mean"
 )
 }
 \arguments{
-\item{beta}{array (n,T,N) for N number of curves}
+\item{beta}{Array of sizes \eqn{n \times T \times N} for \eqn{N} curves
+of dimension \eqn{n} evaluated on a grid of \eqn{T} points}
 
-\item{mode}{Open ("O") or Closed ("C") curves}
+\item{mode}{Open (\code{"O"}) or Closed (\code{"C"}) curves}
 
-\item{rotated}{Optimize over rotation (default = T)}
+\item{rotated}{Optimize over rotation (default = \code{TRUE})}
 
-\item{scale}{Include scale (default = F)}
+\item{scale}{Include scale (default = \code{FALSE})}
 
 \item{lambda}{A numeric value specifying the elasticity. Defaults to \code{0.0}.}
 
@@ -36,7 +37,9 @@ Returns a list containing \item{betan}{aligned curves}
 \item{q_mu}{mean SRVFs}
 }
 \description{
-Aligns a collection of curves using the elastic square-root velocity (srvf) framework.
+Aligns a collection of curves using the elastic square-root velocity (srvf)
+framework. If the curves are describing multidimensional functional data, then
+\code{rotated == FALSE} and \code{mode == 'O'}
 }
 \examples{
 data("mpeg7")

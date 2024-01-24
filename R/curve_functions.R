@@ -156,10 +156,11 @@ shift_f <- function(f, tau){
 }
 
 
-find_rotation_seed_coord <- function(beta1, beta2, mode="O"){
+find_rotation_seed_coord <- function(beta1, beta2, mode="O", rotation=TRUE,
+                                     scale=TRUE){
     n = nrow(beta1)
     T1 = ncol(beta1)
-    q1 = curve_to_q(beta1)$q
+    q1 = curve_to_q(beta1, scale)$q
 
     scl = 4
     minE = 1000
@@ -179,18 +180,24 @@ find_rotation_seed_coord <- function(beta1, beta2, mode="O"){
         } else {
             beta2n = beta2
         }
-        out = find_best_rotation(beta1, beta2n)
-        beta2n = out$q2new
-        q2n = curve_to_q(beta2n)$q
+
+        if (rotation){
+          out = find_best_rotation(beta1, beta2n)
+          beta2n = out$q2new
+          q2n = curve_to_q(beta2n, scale)$q
+          Rout = out$R
+        } else {
+          q2n = curve_to_q(beta2n, scale)$q
+          Rout = diag(nrow(beta2n))
+        }
+
 
         if (norm(q1-q2n,'F') > 0.0001){
-            q1 = q1/sqrt(innerprod_q2(q1, q1))
-            q2n = q2n/sqrt(innerprod_q2(q2n, q2n))
-            q1i = q1
+            q1i = q1/sqrt(innerprod_q2(q1, q1))
+            q2ni = q2n/sqrt(innerprod_q2(q2n, q2n))
             dim(q1i) = c(T1*n)
-            q2i = q2n
-            dim(q2i) = c(T1*n)
-            gam0 = .Call('DPQ', PACKAGE = 'fdasrvf', q1i, q2i, n, T1, 0, 1, 0, rep(0,T1))
+            dim(q2ni) = c(T1*n)
+            gam0 = .Call('DPQ', PACKAGE = 'fdasrvf', q1i, q2ni, n, T1, 0, 1, 0, rep(0,T1))
             gamI = invertGamma(gam0)
             gam = (gamI-gamI[1])/(gamI[length(gamI)]-gamI[1])
             beta2n = q_to_curve(q2n)
@@ -213,7 +220,7 @@ find_rotation_seed_coord <- function(beta1, beta2, mode="O"){
         }
         Ec = acos(dist)
         if (Ec < minE){
-            Rbest = out$R
+            Rbest = Rout
             beta2best = beta2new
             q2best = q2new
             gambest = gam
@@ -226,7 +233,8 @@ find_rotation_seed_coord <- function(beta1, beta2, mode="O"){
 }
 
 
-find_rotation_seed_unqiue <- function(q1, q2, mode="O", lam=0.0){
+find_rotation_seed_unqiue <- function(q1, q2, mode="O", rotation=TRUE, scale=TRUE,
+                                      lam=0.0){
     n1 = nrow(q1)
     T1 = ncol(q1)
     scl = 4
@@ -243,17 +251,22 @@ find_rotation_seed_unqiue <- function(q1, q2, mode="O", lam=0.0){
         } else {
             q2n = q2
         }
-        out = find_best_rotation(q1, q2n)
-        q2n = out$q2new
+
+        if (rotation){
+          out = find_best_rotation(q1, q2n)
+          q2n = out$q2new
+          Rbest = out$R
+        } else {
+          Rbest = diag(nrow(q2n))
+        }
+
 
         if (norm(q1-q2n,'F') > 0.0001){
-            q1 = q1/sqrt(innerprod_q2(q1, q1))
-            q2n = q2n/sqrt(innerprod_q2(q2n, q2n))
-            q1i = q1
+            q1i = q1/sqrt(innerprod_q2(q1, q1))
+            q2ni = q2n/sqrt(innerprod_q2(q2n, q2n))
             dim(q1i) = c(T1*n1)
-            q2i = q2n
-            dim(q2i) = c(T1*n1)
-            gam0 = .Call('DPQ', PACKAGE = 'fdasrvf', q1i, q2i, n1, T1, lam, 1, 0, rep(0,T1))
+            dim(q2ni) = c(T1*n1)
+            gam0 = .Call('DPQ', PACKAGE = 'fdasrvf', q1i, q2ni, n1, T1, lam, 1, 0, rep(0,T1))
             gamI = invertGamma(gam0)
             gam = (gamI-gamI[1])/(gamI[length(gamI)]-gamI[1])
             beta2n = q_to_curve(q2n)
@@ -275,7 +288,7 @@ find_rotation_seed_unqiue <- function(q1, q2, mode="O", lam=0.0){
         }
         Ec = acos(dist)
         if (Ec < minE){
-            Rbest = out$R
+            Rbest = Rbest
             q2best = q2new
             gambest = gam
             minE = Ec

@@ -1,15 +1,16 @@
 #' Calculates two elastic distance
 #'
-#' This functions calculates the distances between functions,
+#' This functions calculates the distances between functions in \eqn{R^1}
 #' \eqn{D_y} and \eqn{D_x}, where function 1 is aligned to function 2
 #'
-#' @param f1 sample function 1
-#' @param f2 sample function 2
-#' @param time sample points of functions
-#' @param lambda controls amount of warping (default = 0)
-#' @param pen alignment penalty (default="roughness") options are
-#' second derivative ("roughness"), geodesic distance from id ("geodesic"), and
-#' norm from id ("norm")
+#' @param f1 sample function 1, provided as a vector of length \eqn{M}
+#' @param f2 sample function 2, provided as a vector of length \eqn{M}
+#' @param time sample points of functions, provided as a vector of length
+#'    \eqn{M}
+#' @param lambda controls amount of warping (default = `0`)
+#' @param pen alignment penalty (default = `"roughness"`) options are
+#' second derivative (`"roughness"`), geodesic distance from id (`"geodesic"`),
+#' and norm from id (`"norm"`)
 #' @return Returns a list containing \item{Dy}{amplitude distance}
 #' \item{Dx}{phase distance}
 #' @keywords distances
@@ -27,7 +28,7 @@
 #'   f2 = simu_data$f[, 2],
 #'   time = simu_data$time
 #' )
-elastic.distance <- function(f1,f2,time,lambda = 0,pen="roughness"){
+elastic.distance <- function(f1, f2, time, lambda = 0, pen="roughness"){
     q1 <- f_to_srvf(f1,time)
     q2 <- f_to_srvf(f2,time)
     gam <- optimum.reparam(q1,time,q2,time,lambda,pen)

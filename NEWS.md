@@ -1,12 +1,22 @@
+# fdasrvf 2.2.X
+
+# fdasrvf 2.2.0
+* bugfixes
+* added `curve_depth` function (#31)
+* clarification of multivariate functional data (#31 and #32)
+* expanded `calc_shape_dist` for different pre-shape spaces
+* expanded curve functions for different pre-shape spaces
+* added predict functions to fpca to project new samples onto basis
+
 # fdasrvf 2.1.2
-* add rbfgs c++ code
+* add rlbfgs c++ code (#30)
 
 # fdasrvf 2.1.1
-* bugfixes
+* bugfixes (#27)
 
 # fdasrvf 2.1.0
 * added elastic change point functions
-* exposed `SqrtMeanInverse` and `inv_exp_map` to global
+* exposed `SqrtMeanInverse` and `inv_exp_map` to global (#29)
 * bugfixes
 
 # fdasrvf 2.0.3
