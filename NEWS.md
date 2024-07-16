@@ -1,4 +1,15 @@
-# fdasrvf 2.2.X
+# fdasrvf 2.3.X
+
+# fdasrvf 2.3.0
+* fixed scaling in `curve_karcher_mean`
+* parallelized `curve_karcher_mean` and `curve_srvf_align`
+* updated `sample_shapes` and created `curveboxplot` (#39)
+* bugfixes (#38)
+* improved distance matrix computation (#45)
+* refactor karcher mean (#40 and #47)
+* updated README (#50)
+* updated plotting routines
+* add  elastic changepoint functions`elastic_amp_change_ff`, `elastic_ph_change_ff`, and `elastic_change_fpca` 
 
 # fdasrvf 2.2.0
 * bugfixes
@@ -91,7 +102,7 @@
 # fdasrvf 1.8.3
 * added bayesian alignment method by Y. Lu et. al
 * added multiple functional alignment function
-* bugfixes to curve alginment
+* bugfixes to curve alignment
 
 # fdasrvf 1.8.2
 * added objects for outputs of time_warping, boxplot, and pca functions

@@ -8,48 +8,87 @@ calc_shape_dist(
   beta1,
   beta2,
   mode = "O",
+  alignment = TRUE,
   rotation = TRUE,
   scale = TRUE,
-  include.length = FALSE
+  include.length = FALSE,
+  lambda = 0
 )
 }
 \arguments{
-\item{beta1}{curve1, provided as a matrix of sizes \eqn{n\times T} for
-\eqn{n}-dimensional curve on \eqn{T} sample points}
+\item{beta1}{A numeric matrix of shape \eqn{L \times M} specifying an
+\eqn{L}-dimensional curve evaluated on \eqn{M} sample points.}
 
-\item{beta2}{curve 2, provided as a matrix of sizes \eqn{n\times T} for
-\eqn{n}-dimensional curve on \eqn{T} sample points}
+\item{beta2}{A numeric matrix of shape \eqn{L \times M} specifying an
+\eqn{L}-dimensional curve evaluated on \eqn{M} sample points. This curve
+will be aligned to \code{beta1}.}
 
-\item{mode}{Open (\code{"O"}) or Closed (\code{"C"}) curves}
+\item{mode}{A character string specifying whether the input curves should be
+considered open (\code{mode == "O"}) or closed (\code{mode == "C"}). Defaults to
+\code{"O"}.}
 
-\item{rotation}{Include rotation (default = \code{TRUE})}
+\item{alignment}{A boolean value specifying whether the curves should be
+aligned before computing the distance matrix. Defaults to \code{TRUE}.}
 
-\item{scale}{scale curves to unit length (default = \code{TRUE})}
+\item{rotation}{A boolean specifying whether the distance should be made
+invariant by rotation. Defaults to \code{TRUE}.}
 
-\item{include.length}{include length in distance calculation (default = \code{FALSE})
-this only applies if \code{scale=TRUE}}
+\item{scale}{A boolean specifying whether the distance should be made
+invariant by scaling. This is effectively achieved by making SRVFs having
+unit length and switching to an appropriate metric on the sphere between
+normalized SRVFs. Defaults to \code{TRUE}.}
+
+\item{include.length}{A boolean specifying whether to include information
+about the actual length of the SRVFs in the metric when using normalized
+SRVFs to achieve scale invariance. This only applies if \code{scale == TRUE}.
+Defaults to \code{FALSE}.}
+
+\item{lambda}{A numeric value specifying the weight of a penalty term that
+constraints the warping function to be not too far from the identity.
+Defaults to \code{0.0}.}
 }
 \value{
-Returns a list containing \item{d}{geodesic distance}
-\item{dx}{phase distance}
-\item{q1}{srvf of curve 1}
-\item{q2n}{srvf of aligned curve 2}
+A list with the following components:
+\itemize{
+\item \code{d}: the amplitude (geodesic) distance;
+\item \code{dx}: the phase distance;
+\item \code{q1}: the SRVF of \code{beta1};
+\item \code{q2n}: the SRVF of \code{beta2} after alignment and possible optimal rotation
+and scaling;
+\item \code{beta1}: the input curve \code{beta1};
+\item \code{beta2n}: the input curve \code{beta2} after alignment and possible optimal
+rotation and scaling.
+\item \code{R}: the optimal rotation matrix that has been applied to the second curve;
+\item \code{gam}: the optimal warping function that has been applied to the second
+curve;
+\item \code{betascale}: the optimal scaling factor that has been applied to the second
+curve.
+}
 }
 \description{
-Calculate elastic shape distance between two curves beta1 and beta2. If the
-curves beta1 and beta2 are describing multidimensional functional data, then
-\code{rotation == FALSE} and \code{mode == 'O'}
+Calculates the elastic shape distance between two curves \code{beta1} and \code{beta2}.
+}
+\details{
+Distances are computed between the SRVFs of the original curves. Hence, they
+are intrinsically invariant to position. The user can then choose to make
+distances invariant to rotation and scaling by setting \code{rotation} and \code{scale}
+accordingly. Distances can also be made invariant to reparametrization by
+setting \code{alignment = TRUE}, in which case curves are aligned using an
+appropriate action of the diffeomorphism group on the space of SRVFs.
 }
 \examples{
 out <- calc_shape_dist(beta[, , 1, 1], beta[, , 1, 4])
 }
 \references{
 Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape
-analysis of elastic curves in euclidean spaces. Pattern Analysis and Machine
-Intelligence, IEEE Transactions on 33 (7), 1415-1428.
+analysis of elastic curves in euclidean spaces. Pattern Analysis and
+Machine Intelligence, IEEE Transactions on 33 (7), 1415-1428.
 
 Kurtek, S., Srivastava, A., Klassen, E., and Ding, Z. (2012),
 “Statistical Modeling of Curves Using Shapes and Related Features,” Journal
 of the American Statistical Association, 107, 1152–1165.
+
+Srivastava, A., Klassen, E. P. (2016). Functional and shape
+data analysis, 1. New York: Springer.
 }
 \keyword{distances}

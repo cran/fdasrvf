@@ -8,23 +8,44 @@
 #' of dimension \eqn{n} evaluated on a grid of \eqn{T} points
 #' @param mode Open (`"O"`) or Closed (`"C"`) curves
 #' @param rotated Optimize over rotation (default = `TRUE`)
-#' @param scale Include scale (default = `FALSE`)
+#' @param scale scale curves to unit length (default = `TRUE`)
 #' @param lambda A numeric value specifying the elasticity. Defaults to `0.0`.
 #' @param maxit maximum number of iterations
-#' @param ms string defining whether the Karcher mean ("mean") or Karcher median ("median") is returned (default = "mean")
-#' @return Returns a list containing \item{betan}{aligned curves}
-#' \item{qn}{aligned srvfs}
-#' \item{betamean}{mean curve}
-#' \item{q_mu}{mean SRVFs}
+#' @param ms string defining whether the Karcher mean ("mean") or Karcher median
+#'   ("median") is returned (default = "mean")
+#' @param parallel A boolean specifying whether to run calculations in parallel.
+#'   Defaults to `TRUE`.
+#' @return An object of class `fdacurve` which is a list with the following
+#'   components:
+#' - `mu`: mean srvf
+#' - `beta`: centered curves
+#' - `betamean`: mean or median curve
+#' - `betan`: aligned curves
+#' - `qn`: aligned srvfs
+#' - `type`: string indicating whether mean or median is returned
+#' - `v`: shooting vectors
+#' - `q`: array of srvfs
+#' - `gam`: array of warping functions
+#' - `cent`: centers of original curves
+#' - `len`: length of curves
+#' - `len_q`: length of srvfs
+#' - `mean_scale`: mean length
+#' - `mean_scale_q`: mean length srvf
+#' - `E`: energy
+#' - `qun`: cost function
 #' @keywords srvf alignment
-#' @references Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape analysis of elastic curves in euclidean spaces. Pattern Analysis and Machine Intelligence, IEEE Transactions on 33 (7), 1415-1428.
+#' @references Srivastava, A., Klassen, E., Joshi, S., Jermyn, I., (2011). Shape
+#'    analysis of elastic curves in euclidean spaces. Pattern Analysis and
+#'    Machine Intelligence, IEEE Transactions on 33 (7), 1415-1428.
 #' @export
 #' @examples
 #' data("mpeg7")
 #' # note: use more shapes and iterations, small for speed
-#' out = curve_srvf_align(beta[,,1,1:2],maxit=2)
-curve_srvf_align <- function(beta, mode = "O", rotated = TRUE, scale = FALSE,
-                             lambda = 0.0, maxit = 20, ms = "mean"){
+#' out = curve_srvf_align(beta[,,1,1:2],maxit=2,parallel=FALSE)
+curve_srvf_align <- function(beta, mode = "O", rotated = TRUE, scale = TRUE,
+                             lambda = 0.0, maxit = 20, ms = "mean",
+                             parallel=TRUE){
+
     if (mode == "C"){
       isclosed = TRUE
     }
@@ -32,7 +53,16 @@ curve_srvf_align <- function(beta, mode = "O", rotated = TRUE, scale = FALSE,
     n = tmp[1]
     T1 = tmp[2]
     N = tmp[3]
-    out = curve_karcher_mean(beta, mode, rotated, scale, lambda, maxit, ms)
+
+    for (ii in 1:N) {
+      beta1 = beta[ , , ii]
+      centroid1 = calculatecentroid(beta1)
+      dim(centroid1) = c(length(centroid1), 1)
+      beta1 = beta1 - repmat(centroid1, 1, T1)
+      beta[ , , ii] = beta1
+    }
+
+    out = curve_karcher_mean(beta, mode, rotated, scale, lambda, maxit, ms, parallel)
     beta<-out$beta
     mu = out$mu
     betamean = out$betamean
@@ -44,22 +74,38 @@ curve_srvf_align <- function(beta, mode = "O", rotated = TRUE, scale = FALSE,
     rotmat = array(0, c(n, n, N))
     gams = matrix(0, T1, N)
 
+    if (parallel) {
+      cores <- max(parallel::detectCores() - 1, 1)
+      cl <- parallel::makeCluster(cores)
+      doParallel::registerDoParallel(cl)
+    } else
+      foreach::registerDoSEQ()
+
     # align to mean
-    for (ii in 1:N){
-        q1 = q[ , , ii]
-        beta1 = beta[ , , ii]
+    outfor <- foreach::foreach(n = 1:N, .combine = cbind, .packages='fdasrvf') %dopar% {
+      out <- curve_align_sub(beta[, , n], q[, , n], mu, mode, rotated, scale, lambda)
 
-        out = find_rotation_seed_unqiue(mu, q1, mode, rotated, TRUE, lambda)
-        gams[,ii] = out$gambest
-        beta1 = out$Rbest%*%beta1
-        beta1n = group_action_by_gamma_coord(beta1, out$gambest)
-        q1n = curve_to_q(beta1n)$q
-
-        out = find_best_rotation(mu, q1n)
-        qn[,,ii] = out$q2new
-        betan[,,ii] = out$R%*%beta1n
-        rotmat[,,ii] = out$R
+      list(out$qn, out$betan, out$rotmat, out$gam)
     }
-    return(list(betan = betan, qn = qn, betamean = betamean, q_mu = mu,
-                rotmat = rotmat, gams = gams, v = v))
+
+    qn <- unlist(outfor[1, ])
+    dim(qn) <- c(n, T1, N)
+
+    betan <- unlist(outfor[2, ])
+    dim(betan) <- c(n, T1, N)
+
+    rotmat <- unlist(outfor[3, ])
+    dim(rotmat) <- c(n, n, N)
+
+    gams <- unlist(outfor[4, ])
+    dim(gams) <- c(T1, N)
+
+    if (parallel) parallel::stopCluster(cl)
+
+    out$betan = betan
+    out$qn = qn
+    out$rotmat = rotmat
+    out$gam = gams
+
+    return(out)
 }

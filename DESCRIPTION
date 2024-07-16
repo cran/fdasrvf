@@ -1,8 +1,8 @@
 Package: fdasrvf
 Type: Package
 Title: Elastic Functional Data Analysis
-Version: 2.2.0
-Date: 2024-1-24
+Version: 2.3.0
+Date: 2024-7-13
 Authors@R: c(
     person(given = "J. Derek", 
            family = "Tucker", 
@@ -16,7 +16,7 @@ Authors@R: c(
            comment = c(ORCID = "0000-0002-8725-3654")))
 Description: Performs alignment, PCA, and modeling of multidimensional and 
     unidimensional functions using the square-root velocity framework 
-    (Srivastava et al., 2011 <arXiv:1103.3817> and Tucker et al., 2014 
+    (Srivastava et al., 2011 <doi:10.48550/arXiv.1103.3817> and Tucker et al., 2014 
     <DOI:10.1016/j.csda.2012.12.001>). This framework allows for elastic 
     analysis of functional data through phase and amplitude separation.
 License: GPL-3
@@ -26,16 +26,16 @@ Imports: cli, coda, doParallel, fields, foreach, lpSolve, Matrix,
 Suggests: covr, interp, plot3D, plot3Drgl, rgl, testthat (>= 3.0.0),
         withr
 Depends: R (>= 4.3.0),
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.2
 Encoding: UTF-8
 Config/testthat/edition: 3
 LinkingTo: Rcpp, RcppArmadillo
 URL: https://github.com/jdtuck/fdasrvf_R
 BugReports: https://github.com/jdtuck/fdasrvf_R/issues
 NeedsCompilation: yes
-Packaged: 2024-01-24 17:15:18 UTC; jdtuck
+Packaged: 2024-07-16 11:48:36 UTC; jdtuck
 Author: J. Derek Tucker [aut, cre] (<https://orcid.org/0000-0001-8844-2169>),
   Aymeric Stamm [ctb] (<https://orcid.org/0000-0002-8725-3654>)
 Maintainer: J. Derek Tucker <jdtuck@sandia.gov>
 Repository: CRAN
-Date/Publication: 2024-01-24 17:50:02 UTC
+Date/Publication: 2024-07-16 21:10:05 UTC
