@@ -1,6 +1,11 @@
 exp_map <- function(psi, v, wnorm = l2_norm){
   v_norm <- wnorm(v)
-  expgam <- cos(v_norm) * psi + sin(v_norm) * v / v_norm
+  if (sum(v_norm) == 0){
+    expgam <- cos(v_norm) * psi
+  } else {
+    expgam <- cos(v_norm) * psi + sin(v_norm) * v / v_norm
+  }
+  
   return(expgam)
 }
 
@@ -188,7 +193,7 @@ findkarcherinv <- function(warps, times, round = F){
 #'
 #' @keywords srvf alignment
 #' @export
-gam_to_v<-function(gam, smooth=TRUE){
+gam_to_v<-function(gam, smooth=FALSE){
   if (ndims(gam) == 0){
     TT = length(gam)
     eps = .Machine$double.eps
@@ -288,7 +293,7 @@ v_to_gam<-function(v){
 #'
 #' @keywords srvf alignment
 #' @export
-gam_to_h<-function(gam, smooth=TRUE){
+gam_to_h<-function(gam, smooth=FALSE){
   if (ndims(gam) == 0){
     TT = length(gam)
     time <- seq(0,1,length.out=TT)
