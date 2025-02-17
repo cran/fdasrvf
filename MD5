@@ -1,6 +1,6 @@
-8c9c45a0c8542615b55785ae61340cc4 *DESCRIPTION
+8c62eb5fd0c560274317d3dfbc4692e5 *DESCRIPTION
 02782b8fb1b965db64bbc7b966473392 *NAMESPACE
-32631484a13b988f290f39406bddcbea *NEWS.md
+e47b796ef4be7338555b7b8c07a00f0f *NEWS.md
 33a4f8a312b9733b1b5108a2aa31abd6 *R/BBridge.R
 d2494fe5875fa61a9ffd7de0bbb11d25 *R/LongRunCovMatrix.R
 9d3063ea4eb4e51623339ef38b542647 *R/RcppExports.R
@@ -43,7 +43,7 @@ fb2f3ca7fd96dec7e59434abae319142 *R/gradient.R
 e5bc1e0a00d3bd2b46b78bb4584e229f *R/image_funcs.R
 7e70ab8f2072cd5c380723a86d9e6e5f *R/invertGamma.R
 d5832c20c52bd11826f580ca358e554e *R/joint_gauss_model.R
-c6ff45440d0968780c01850c022711e4 *R/jointfPCA.R
+91fe9ed6c7a79d320f83a79a9b39bd2f *R/jointfPCA.R
 9dbf5a41fd726560b94f2ad6835b17dc *R/kmeans.R
 f2e151c8ab152625e16254f247529564 *R/multiple_align_functions.R
 936bea663fb5a1f29b0ca4e898a83099 *R/multivariate_karcher_mean.R
@@ -211,7 +211,7 @@ c742a89d1b58b37883b920b83932123c *man/warp_q_gamma.Rd
 0924fc774c064e1f227ce73fdbd59d50 *src/Makevars
 53f69b9c91fca61d3cb5d217560f8386 *src/Makevars.win
 fc121cbbb181d88c5935938c16e21718 *src/RcppExports.cpp
-94a169c0d13c97a0fc71f5c758604abb *src/bayesian.cpp
+796ffd30b6e57c8a12c1536751188e9e *src/bayesian.cpp
 489b9dc01b953e914742756ec8c3b2ec *src/bayesian.h
 829cc3879e8081769ca3f1a2c072ad41 *src/fdaqmap/incl/ImageRegister.h
 31b0731ebec82a6dbda4ca8fe8c06549 *src/fdaqmap/incl/UnitSquareImage.h
