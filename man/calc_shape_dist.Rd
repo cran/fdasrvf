@@ -11,6 +11,7 @@ calc_shape_dist(
   alignment = TRUE,
   rotation = TRUE,
   scale = TRUE,
+  optim_method = "DP",
   include.length = FALSE,
   lambda = 0
 )
@@ -37,6 +38,9 @@ invariant by rotation. Defaults to \code{TRUE}.}
 invariant by scaling. This is effectively achieved by making SRVFs having
 unit length and switching to an appropriate metric on the sphere between
 normalized SRVFs. Defaults to \code{TRUE}.}
+
+\item{optim_method}{A string specifying the algorithm used for optimization.
+Choices are \code{"DP"} and \code{"DPo"} Defaults to \code{"DP"}.}
 
 \item{include.length}{A boolean specifying whether to include information
 about the actual length of the SRVFs in the metric when using normalized
@@ -72,7 +76,7 @@ Calculates the elastic shape distance between two curves \code{beta1} and \code{
 Distances are computed between the SRVFs of the original curves. Hence, they
 are intrinsically invariant to position. The user can then choose to make
 distances invariant to rotation and scaling by setting \code{rotation} and \code{scale}
-accordingly. Distances can also be made invariant to reparametrization by
+accordingly. Distances can also be made invariant to reparameterization by
 setting \code{alignment = TRUE}, in which case curves are aligned using an
 appropriate action of the diffeomorphism group on the space of SRVFs.
 }

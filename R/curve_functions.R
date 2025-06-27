@@ -169,8 +169,10 @@ find_rotation_seed_coord <- function(beta1, beta2,
 
   for (ctr in 0:end_idx) {
     if (mode == "C") {
-      if (scl * ctr <= end_idx)
+      if (scl * ctr <= end_idx){
         beta2n <- shift_f(beta2, scl * ctr)
+        beta2n[, M] = beta2n[, 1]
+      }
       else
         break
     } else
@@ -245,10 +247,13 @@ find_rotation_seed_unique <- function(q1, q2,
                                       alignment = TRUE,
                                       rotation = TRUE,
                                       scale = TRUE,
+                                      omethod = "DP",
                                       norm_ratio = 1.0,
                                       lambda = 0.0) {
   L <- nrow(q1)
   M <- ncol(q1)
+
+  method <- match.arg(omethod, choices = c("DP", "DPo"))
 
   # Variables for DPQ2 algorithm
   grd <- seq(0, 1, length.out = M)
@@ -286,10 +291,18 @@ find_rotation_seed_unique <- function(q1, q2,
       dim(q1i) <- M * L
       dim(q2ni) <- M * L
 
-      ret <- DPQ2(q1i, grd, q2ni, grd, L, M, M, grd, grd, M, M, lambda, nbhd_dim)
-      Gvec <- ret$G[1:ret$size]
-      Tvec <- ret$T[1:ret$size]
-      gamI <- stats::approx(Tvec, Gvec, xout = grd)$y
+      switch(
+        method,
+        DP = {
+          ret <- DPQ2(q1i, grd, q2ni, grd, L, M, M, grd, grd, M, M, lambda, nbhd_dim)
+          Gvec <- ret$G[1:ret$size]
+          Tvec <- ret$T[1:ret$size]
+          gamI <- stats::approx(Tvec, Gvec, xout = grd)$y
+        },
+        DPo = {
+          gamI <- DPQ(q2ni, q1i, L, M, lambda, 1, 0)
+        }
+      )
 
       gam <- (gamI - gamI[1]) / (gamI[length(gamI)] - gamI[1])
       q2new <- group_action_by_gamma(q2n, gam, scale = scale)
@@ -381,7 +394,7 @@ project_curve <- function(q){
       dt = 0.2
     }
 
-    epsilon =- 1e-6
+    epsilon = 1e-6
 
     e = diag(1,n)
     iter = 1
@@ -630,6 +643,7 @@ rot_mat <- function(theta){
 
 karcher_calc <- function(q1, mu, basis,
                          rotated = TRUE,
+                         scale = TRUE,
                          mode = "O",
                          lambda = 0.0,
                          ms = "mean") {
@@ -704,7 +718,7 @@ curve_align_sub <- function(beta1, q1, mu, mode, rotated, scale, lambda){
 }
 
 
-elastic_shooting <- function(q1, v,mode="O"){
+elastic_shooting <- function(q1, v, mode="O"){
     d = sqrt(innerprod_q2(v,v))
     if (d < 0.00001){
         q2n = q1
@@ -730,6 +744,7 @@ match_f2_to_f1 <- function(srvf1, srvf2, beta2,
                            alignment = TRUE,
                            rotation = FALSE,
                            scale = FALSE,
+                           omethod = "DP",
                            include_length = FALSE,
                            lambda = 0.0) {
   norm_ratio <- 1
@@ -742,6 +757,7 @@ match_f2_to_f1 <- function(srvf1, srvf2, beta2,
     rotation = rotation,
     scale = scale,
     lambda = lambda,
+    omethod = omethod,
     norm_ratio = norm_ratio
   )
 
@@ -777,4 +793,39 @@ match_f2_to_f1 <- function(srvf1, srvf2, beta2,
     Rbest = out$Rbest,
     gambest = gam
   )
+}
+
+#' map shooting vector to curve at mean
+#'
+#'
+#' @param v Either a numeric vector of a numeric matrix or a numeric array
+#'   specifying the shooting vectors
+#' @param mu vector describing the mean
+#' @param mode A character string specifying whether the input curves should be
+#'   considered open (`mode == "O"`) or closed (`mode == "C"`). Defaults to
+#'   `"O"`.
+#' @param scale original scale of curve
+#' @return A numeric array of the same shape as the input array `v` storing the
+#'   curves of `v`.
+#'
+#' @keywords srvf alignment
+#' @export
+v_to_curve<-function(v, mu, mode="O", scale=1){
+  n = nrow(mu)
+  T1 = ncol(mu)
+  if (ndims(v) == 0){
+    dim(v) = c(n,T1)
+    q2n = elastic_shooting(mu, v, mode)
+    p = q_to_curve(q2n, scale)
+  } else {
+
+    p = matrix(0,T1,n)
+    for (i in 1:n){
+      v1 = v[,i]
+      dim(v1) = c(n,T1)
+      q2n = elastic_shooting(mu, v1, mode)
+      p[,i] = q_to_curve(q2n, scale)
+    }
+  }
+  return(p)
 }
