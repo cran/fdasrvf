@@ -1,11 +1,11 @@
-84c56cf21525ef7e16671ee75f34e8d4 *DESCRIPTION
-89e5ffe7213030cfc8dbae15d8e5713e *NAMESPACE
-22c3fda129dc8a7784a4e1ee5bd6b304 *NEWS.md
+36ecd1b5da5472694cbe9d975ace5645 *DESCRIPTION
+b73f45f0fc057f708af01618f7d450b6 *NAMESPACE
+a5291732a54542c672b899ea20fb8859 *NEWS.md
 33a4f8a312b9733b1b5108a2aa31abd6 *R/BBridge.R
 d2494fe5875fa61a9ffd7de0bbb11d25 *R/LongRunCovMatrix.R
 9d3063ea4eb4e51623339ef38b542647 *R/RcppExports.R
 9d6880bf7cb04a70d682956076bda5da *R/SqrtMean.R
-e26332ae91de50c72ad0b137f17978c8 *R/SqrtMedian.R
+481208123e12658d0fee7d1cb4d6f115 *R/SqrtMedian.R
 79c24b16964031f7c3eeaeae88a86b79 *R/align-fpca.R
 9b539bd36b90c6212f602ba896e5481c *R/boxplot.R
 cce8f8412a0aa5867e0524b1279ecc46 *R/calc_shape_dist.R
@@ -36,6 +36,7 @@ a9cca3a3259c14e4aea8f776a972acee *R/gauss_model.R
 228c4c7f1bf7dc0267909a9b98bcebd4 *R/geometry.R
 fb2f3ca7fd96dec7e59434abae319142 *R/gradient.R
 676e4a53cf8c4214398f4b7e4c4ae8a5 *R/horizFPCA.R
+1a97d2d341dffb4c1d867ab1275f2ed3 *R/horizFPNS.R
 e5bc1e0a00d3bd2b46b78bb4584e229f *R/image_funcs.R
 7e70ab8f2072cd5c380723a86d9e6e5f *R/invertGamma.R
 d5832c20c52bd11826f580ca358e554e *R/joint_gauss_model.R
@@ -57,6 +58,7 @@ c1029b492fe7ef4e57d4b935025dcdda *R/plot.fdacurve.R
 b55577d85204d8448dbd2cdae367a5f6 *R/plot.fdakma.R
 f0665ed5c7e42a9f763cfe34cfdf4a4c *R/plot.fdawarp.R
 3cd3e921bfd1960253b0264ccea1f53a *R/plot.hfpca.R
+93246e17e1957f29d76f7a75abcd92fb *R/plot.hfpns.R
 3262799cd4bbef8a44a1d66a992663bb *R/plot.jfpca.R
 c1d5b54e8311160cf25036de13d3af99 *R/plot.jfpcah.R
 b43fdc15ba1a863b57bb440f564af981 *R/plot.vfpca.R
@@ -85,12 +87,12 @@ cd29ca95d19b4cfb1d1a3450eeeae240 *R/srvf_to_f.R
 8676de3e2a69ab54a44ca72af12722cd *R/summary.fdawarp.R
 4d1754e0479bbc4a6464be7e9d53f58f *R/time-warping.R
 2fd3ad3a54255347ea8a46f8fe1ab4ec *R/tolerance.R
-9fc17984373bc186118ed1408d6390ee *R/utils-pointwise.R
-1da9d992f5432c0dc70bad508aec699b *R/utils.R
+ec7178e246cd3795ee232973fc5aec5e *R/utils-pointwise.R
+fa2b2e33116fb1a913d6fc436964c91c *R/utils.R
 8121bbcd9ae2be6514642bf3db6d5b35 *R/vertFPCA.R
 9983cf33216e880f77d2839d08c62059 *R/warp_f_gamma.R
 4f28584fc2be05a77c6085e1521311ab *R/warp_q_gamma.R
-7fc9c6706fe94fe4c2f454a80705f356 *README.md
+bb1056e832f239fde829bb4a4832eec4 *README.md
 51bba83ca898035d3e444f6f71fe3b40 *data/beta.rda
 c344b97d7e3af50df91ae942ba447a13 *data/growth_vel.rda
 f140c32212340a4317515f1232ec39d7 *data/im.rda
@@ -161,6 +163,7 @@ de3155c1932201fb0d5182954e84aa7e *man/get_warping_distance.Rd
 887703f71caebfbd99884bde6d3923ef *man/growth_vel.Rd
 011a4c4e5ca03efcfc236a4f5f3d0804 *man/h_to_gam.Rd
 f127ff8518a9a4a171f36e218906781d *man/horizFPCA.Rd
+5de7ae125b706cc84efa9a57ba5834b3 *man/horizFPNS.Rd
 36f3fb76747b37bc03080caedd50650c *man/im.Rd
 7e68df497e6eb5caa6d2f44c3912c7cd *man/inv_exp_map.Rd
 ab5400f0fc10cb0a30724059398c2115 *man/invertGamma.Rd
@@ -219,7 +222,7 @@ c742a89d1b58b37883b920b83932123c *man/warp_q_gamma.Rd
 0924fc774c064e1f227ce73fdbd59d50 *src/Makevars
 53f69b9c91fca61d3cb5d217560f8386 *src/Makevars.win
 fc121cbbb181d88c5935938c16e21718 *src/RcppExports.cpp
-796ffd30b6e57c8a12c1536751188e9e *src/bayesian.cpp
+0301530ed3a6e2235eff25ca4b2f5068 *src/bayesian.cpp
 489b9dc01b953e914742756ec8c3b2ec *src/bayesian.h
 829cc3879e8081769ca3f1a2c072ad41 *src/fdaqmap/incl/ImageRegister.h
 31b0731ebec82a6dbda4ca8fe8c06549 *src/fdaqmap/incl/UnitSquareImage.h
