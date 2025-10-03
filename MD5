@@ -1,6 +1,6 @@
-36ecd1b5da5472694cbe9d975ace5645 *DESCRIPTION
-b73f45f0fc057f708af01618f7d450b6 *NAMESPACE
-a5291732a54542c672b899ea20fb8859 *NEWS.md
+0fff4b759c55042f0879f5e24cc3a67e *DESCRIPTION
+4842f767a58b974c5fd100b12c639f4a *NAMESPACE
+12838549b168b1465137e2a8eacf97be *NEWS.md
 33a4f8a312b9733b1b5108a2aa31abd6 *R/BBridge.R
 d2494fe5875fa61a9ffd7de0bbb11d25 *R/LongRunCovMatrix.R
 9d3063ea4eb4e51623339ef38b542647 *R/RcppExports.R
@@ -64,6 +64,7 @@ c1d5b54e8311160cf25036de13d3af99 *R/plot.jfpcah.R
 b43fdc15ba1a863b57bb440f564af981 *R/plot.vfpca.R
 1b52dd436e38b2f32d9bc34035276c33 *R/plot_curve.R
 0c3199f78c125c7168f4a7e3ea0b13e6 *R/pns.R
+05b5632fe455d6f678a3ad7b4eb614a9 *R/ppd.R
 d7aabb93194019d88f3f1252a4f28650 *R/predict.curve_pca.R
 9f0d7ebe44eb627b7b3a28784eb31e8f *R/predict.hfpca.R
 9af82ea5b72bd80ab7c490a87f564c2d *R/predict.jfpca.R
@@ -88,11 +89,11 @@ cd29ca95d19b4cfb1d1a3450eeeae240 *R/srvf_to_f.R
 4d1754e0479bbc4a6464be7e9d53f58f *R/time-warping.R
 2fd3ad3a54255347ea8a46f8fe1ab4ec *R/tolerance.R
 ec7178e246cd3795ee232973fc5aec5e *R/utils-pointwise.R
-fa2b2e33116fb1a913d6fc436964c91c *R/utils.R
+e6c610b509c63ef91ab570800096eb66 *R/utils.R
 8121bbcd9ae2be6514642bf3db6d5b35 *R/vertFPCA.R
 9983cf33216e880f77d2839d08c62059 *R/warp_f_gamma.R
 4f28584fc2be05a77c6085e1521311ab *R/warp_q_gamma.R
-bb1056e832f239fde829bb4a4832eec4 *README.md
+463da271ba7f4d0b3e1eb51a8398b8db *README.md
 51bba83ca898035d3e444f6f71fe3b40 *data/beta.rda
 c344b97d7e3af50df91ae942ba447a13 *data/growth_vel.rda
 f140c32212340a4317515f1232ec39d7 *data/im.rda
@@ -185,6 +186,7 @@ e79e1cac17e703cb6ecebad42dcc10c5 *man/pair_align_image.Rd
 3f541e8988b1cda39ff602467944b0d9 *man/pcaTB.Rd
 5fb99e9351d0cd011c4fedf7f1edb43a *man/phbox_data.Rd
 296e760ddde6d4a7d40ad38703c7b91b *man/plot_curve.Rd
+3ba0c36fcd78780d129a1d7cd22206f5 *man/ppd.Rd
 faa13c05fbddbeef66fb94008e3f78e4 *man/predict.curve_pca.Rd
 bafa0c1c2e47ad0bef13c3a76ad8db98 *man/predict.hfpca.Rd
 3e65dbe8bf1369dc70f174e44c4e7824 *man/predict.jfpca.Rd
