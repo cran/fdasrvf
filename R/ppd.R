@@ -11,6 +11,8 @@
 #' @param max_lam maximum value of lambda. Defaults to `2`
 #' @param num_lam number of steps. Defaults to `10`
 #' @param pt the percentile of negative curvature of raw data Defaults to `.15`
+#' @param srvf perform in srvf space Defaults to `FALSE`
+#' @param mu vector of size \eqn{N} that f is aligned to, Defaults to `NaN`
 #' @param penalty_method A string specifying the penalty term used in the
 #'   formulation of the cost function to minimize for alignment. Choices are
 #'   `"roughness"` which uses the norm of the second derivative, `"geodesic"`
@@ -47,6 +49,8 @@ ppd <- function(f,
                 max_lam = 2,
                 num_lam = 10,
                 pt = 0.15,
+                srvf = FALSE,
+                mu = NaN,
                 penalty_method = c("roughness", "geodesic", "norm"),
                 centroid_type = c("mean", "median"),
                 center_warpings = TRUE,
@@ -65,22 +69,40 @@ ppd <- function(f,
   lam_vec <- seq(0, max_lam, length.out = num_lam)
   fns <- list()
   for (i in 1:num_lam){
-    obj <- time_warping(f, time, lam_vec[i],
-                        penalty_method, centroid_type, center_warpings,
-                        smooth_data, sparam, parallel, cores,
-                        optim_method, max_iter)
-    fns[[i]] <- obj$fn
+    if (any(is.nan(mu))) {
+      obj <- time_warping(f, time, lam_vec[i],
+                          penalty_method, centroid_type, center_warpings,
+                          smooth_data, sparam, parallel, cores,
+                          optim_method, max_iter)
+    } else {
+      obj <- multiple_align_functions(f, time, mu, lam_vec[i],
+                                      penalty_method, FALSE, smooth_data, sparam,
+                                      parallel, cores, optim_method)
+
+    }
+    if (srvf){
+      fns[[i]] <- obj$qn
+    } else {
+      fns[[i]] <- obj$fn
+    }
+
+  }
+
+  if (srvf){
+    f0 = obj$q0
+  } else {
+    f0 = f
   }
 
   # peak persistent diagram
-  # get the trehsold for significant peak
+  # get the threshold for significant peak
   diff_t = mean(diff(time))
   taus = c()
 
   # compute tau values
   for (i in 1:ncol(f)){
-    idx = findpeaks(f[, i])[,2]
-    df2 = gradient(gradient(f[,i], diff_t), diff_t)
+    idx = findpeaks(f0[, i])[,2]
+    df2 = gradient(gradient(f0[,i], diff_t), diff_t)
     tau = -df2 / max(-df2)
     tau[tau < 0] = 0
     taus = c(taus, c(tau[idx]))
@@ -464,10 +486,10 @@ drawPPDSurface <- function(t,lam,FNm,Heights,Locs,IndicatorMatrix,Labels,idx_opt
         plot = FALSE
       )
 
-      # find non-naN indices for significant location matrix and plot
+      # find non-NaN indices for significant location matrix and plot
       idx_sig = which(!is.nan(LocationMatrix_sig[, j]))
       plot3D::points3D(
-        x = t[LocationMatrix_sig[,j]],
+        x = t[LocationMatrix_sig[idx_sig,j]],
         y = lam[idx_sig],
         z = HeightMatrix_sig[idx_sig, j],
         col = "black",
@@ -497,7 +519,7 @@ drawPPDSurface <- function(t,lam,FNm,Heights,Locs,IndicatorMatrix,Labels,idx_opt
 
       # find non-naN indices for significant location matrix and plot
       idx_sig = which(!is.nan(LocationMatrix_sig[, j]))
-      graphics::points(t[LocationMatrix_sig[,j]], lam[idx_sig], col="black",
+      graphics::points(t[LocationMatrix_sig[idx_sig,j]], lam[idx_sig], col="black",
                        lwd = 2)
 
     }

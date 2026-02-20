@@ -1,6 +1,6 @@
-0fff4b759c55042f0879f5e24cc3a67e *DESCRIPTION
+aff0aed7ec832ab160b97aadc85ba780 *DESCRIPTION
 4842f767a58b974c5fd100b12c639f4a *NAMESPACE
-12838549b168b1465137e2a8eacf97be *NEWS.md
+dd81a1d650ecfec1610db8facec536b3 *NEWS.md
 33a4f8a312b9733b1b5108a2aa31abd6 *R/BBridge.R
 d2494fe5875fa61a9ffd7de0bbb11d25 *R/LongRunCovMatrix.R
 9d3063ea4eb4e51623339ef38b542647 *R/RcppExports.R
@@ -12,7 +12,7 @@ cce8f8412a0aa5867e0524b1279ecc46 *R/calc_shape_dist.R
 e1aabb74e07c608061f37707b37d4c9f *R/curve_boxplot.R
 2710004dc8b339e862788a5e8ea42849 *R/curve_depth.R
 927b474920858f8c31a69c4d3495780f *R/curve_dist.R
-6b05f3fc91665924f7cf2c01cbde06bd *R/curve_functions.R
+f25826b5e748169f2e92e9bfc1802aa1 *R/curve_functions.R
 ef6f8bf434068aa58cbb426200c7f24e *R/curve_geodesic.R
 f5f3cca75a75559831ab50d26f3f7863 *R/curve_pair_align.R
 387756aee2ede87f659e0712152934ea *R/curve_to_q.R
@@ -63,11 +63,11 @@ f0665ed5c7e42a9f763cfe34cfdf4a4c *R/plot.fdawarp.R
 c1d5b54e8311160cf25036de13d3af99 *R/plot.jfpcah.R
 b43fdc15ba1a863b57bb440f564af981 *R/plot.vfpca.R
 1b52dd436e38b2f32d9bc34035276c33 *R/plot_curve.R
-0c3199f78c125c7168f4a7e3ea0b13e6 *R/pns.R
-05b5632fe455d6f678a3ad7b4eb614a9 *R/ppd.R
+1afeaac0f6c4d3a7485390f25e02bf91 *R/pns.R
+5a6155b58ba0b84c0d0a85b790dfb994 *R/ppd.R
 d7aabb93194019d88f3f1252a4f28650 *R/predict.curve_pca.R
 9f0d7ebe44eb627b7b3a28784eb31e8f *R/predict.hfpca.R
-9af82ea5b72bd80ab7c490a87f564c2d *R/predict.jfpca.R
+3f7fdb099a1ba3e8b6ad7c2783cb028d *R/predict.jfpca.R
 29b1087b2c072c6ced036eb64ca72e58 *R/predict.jfpcah.R
 7f0279aa6ca287141228f2c3ff1a8a2b *R/predict.lpcr.R
 b6f4e67ebb56295c5ffd0203dc3a46e4 *R/predict.mlpcr.R
@@ -86,14 +86,14 @@ a6a8df5d0324a38cef7504f6b4e88ff5 *R/predict.pcr.R
 5a748f2f57897aa739e84b714a6895f7 *R/smooth.data.R
 cd29ca95d19b4cfb1d1a3450eeeae240 *R/srvf_to_f.R
 8676de3e2a69ab54a44ca72af12722cd *R/summary.fdawarp.R
-4d1754e0479bbc4a6464be7e9d53f58f *R/time-warping.R
+54dbb94960693be985456c7d165bdab0 *R/time-warping.R
 2fd3ad3a54255347ea8a46f8fe1ab4ec *R/tolerance.R
 ec7178e246cd3795ee232973fc5aec5e *R/utils-pointwise.R
 e6c610b509c63ef91ab570800096eb66 *R/utils.R
 8121bbcd9ae2be6514642bf3db6d5b35 *R/vertFPCA.R
 9983cf33216e880f77d2839d08c62059 *R/warp_f_gamma.R
 4f28584fc2be05a77c6085e1521311ab *R/warp_q_gamma.R
-463da271ba7f4d0b3e1eb51a8398b8db *README.md
+239a5165b7731a276c71c1c790a60d72 *README.md
 51bba83ca898035d3e444f6f71fe3b40 *data/beta.rda
 c344b97d7e3af50df91ae942ba447a13 *data/growth_vel.rda
 f140c32212340a4317515f1232ec39d7 *data/im.rda
@@ -138,7 +138,7 @@ e16913146f7bb6bccdd13b452c2e7b94 *man/elastic_ph_change_ff.Rd
 ec11455755bdd4c386888aaad925be15 *man/f_to_srvf.Rd
 abee954bcdc145f645bff94edd8bae48 *man/fdasrvf.Rd
 313068f31baeb252c3700aca6953e225 *man/figures/README-1d_aligned_plot-1.png
-5997c2fe5c27433668353b3083f2e02b *man/figures/README-1d_aligned_plot-2.png
+e0c5e6b99d03837950437b415e24c925 *man/figures/README-1d_aligned_plot-2.png
 df8d53ff1657503b62370aed3a3959f3 *man/figures/README-1d_aligned_plot-3.png
 06ff18233c23ef10a20c853c92f04725 *man/figures/README-1d_aligned_plot-4.png
 792bafe42440582dc0cea66c7cd03eab *man/figures/README-1d_aligned_plot-5.png
@@ -186,7 +186,7 @@ e79e1cac17e703cb6ecebad42dcc10c5 *man/pair_align_image.Rd
 3f541e8988b1cda39ff602467944b0d9 *man/pcaTB.Rd
 5fb99e9351d0cd011c4fedf7f1edb43a *man/phbox_data.Rd
 296e760ddde6d4a7d40ad38703c7b91b *man/plot_curve.Rd
-3ba0c36fcd78780d129a1d7cd22206f5 *man/ppd.Rd
+d11a126941d117d5590c09e95be481ef *man/ppd.Rd
 faa13c05fbddbeef66fb94008e3f78e4 *man/predict.curve_pca.Rd
 bafa0c1c2e47ad0bef13c3a76ad8db98 *man/predict.hfpca.Rd
 3e65dbe8bf1369dc70f174e44c4e7824 *man/predict.jfpca.Rd
@@ -252,7 +252,7 @@ df37a01c401e60c6ca1acbd55ffb3ae5 *src/wrapperSRSF.cpp
 975597366a1fd457e0b685d389ff544f *tests/testthat/_snaps/align-fpca.md
 4b238ff68ff9ea7c7fd5999289382cbb *tests/testthat/_snaps/boxplot.md
 318b82bef34bbd2304386e4b9ee27286 *tests/testthat/_snaps/kmeans.md
-b3ce84acaa65a70d0f514cb3b8e27207 *tests/testthat/_snaps/time-warping.md
+96dce41f8f58ed0b2dd0a10a6346a56c *tests/testthat/_snaps/time-warping.md
 d0dec44a2b10b4a57f60be90c36113ef *tests/testthat/test-align-fpca.R
 7cc3fa15d3622f3282d9de54d9ba0031 *tests/testthat/test-boxplot.R
 7a661b1f5543b399d52395fa82e885a7 *tests/testthat/test-calc-shape-dist.R

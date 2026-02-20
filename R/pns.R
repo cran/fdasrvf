@@ -89,11 +89,35 @@ fastpns <- function (x,
       "\n"
     )
   )
+
+  out$varPNS = out$percent * out$total / 100
   out$spheredata <- (Xssubsphere)
   out$pca <- pca
   out$muhat <- muhat
   out$n.pc <- n.pc
   out
+}
+
+fastPNSs2e <- function(spheredata, PNS){
+  muhat <- PNS$muhat
+  pca <- PNS$pca
+  n.pc <- PNS$n.pc
+
+  Xs <- t(spheredata)
+  n <- nrow(Xs)
+  for (i in 1:n) {
+    Xs[i, ] <- Xs[i, ] / Enorm(Xs[i, ])
+  }
+
+  TT <- Xs
+  for (i in 1:n) {
+    TT[i, ] <- Xs[i, ] - sum(Xs[i, ] * muhat) * muhat
+  }
+
+  ans <- pcscore2sphere3(n.pc, muhat, Xs, t(TT), pca$rotation)
+
+  EuclidData <- PNSs2e(t(ans), PNS$PNS)
+  return(EuclidData)
 }
 
 fastPNSe2s <- function(res , pns) {
@@ -590,6 +614,8 @@ pns = function(x,
   propPNS = varPNS / total * 100
   return(list(
     resmat = resmat,
+    varPNS = varPNS,
+    total = total,
     PNS = PNS,
     percent = propPNS
   ))
