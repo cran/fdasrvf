@@ -1,3 +1,104 @@
+# fdasrvf 2.5.0
+* add `interparc` function for downsampling closed curves
+* fix penalties in rbfgs
+* `optimum.reparam` now applies the selected penalty (`"none"`, `"roughness"`,
+  `"l2gam"`, `"l2psi"`, `"geodesic"`) for the `"DP"` method as well
+* harden the dynamic programming C code against bad inputs and failed
+  allocations
+* `time_warping` and `ppd` now accept every `optimum.reparam` penalty
+  (`"roughness"`, `"l2gam"`, `"l2psi"`, `"geodesic"`, `"none"`);
+  `penalty_method = "norm"`, which always failed with "invalid penalty
+  selection", is now an alias for `"l2gam"`
+* `pair_align_functions`, `multiple_align_functions`, `elastic.distance` and
+  `elastic.depth` now also accept `pen = "norm"` as an alias for `"l2gam"`
+  instead of failing with "invalid penalty selection", and document every
+  `optimum.reparam` penalty
+* `time_warping` and `ppd` no longer list `optim_method = "DP2"`: its
+  coordinate-descent solver was removed from `optimum.reparam` in 2.1.2, so
+  the option always failed partway through with "'arg' should be one of ...".
+  It is now rejected up front; use `"DP"`, `"DPo"` or `"RBFGS"`. The
+  `pair_align_functions` and `multiple_align_functions` docs no longer
+  mention `"DP2"` either
+* `predict` for `elastic.pcr.regression`, `elastic.lpcr.regression` and
+  `elastic.mlpcr.regression` fits no longer fails when `newdata` is supplied;
+  new functions are now aligned with the `lambda`, penalty and optimization
+  method used by `time_warping`, which the `vertFPCA`, `horizFPCA` and
+  `jointFPCA` predict methods now also honor
+* `predict` for `jointFPCAh` fits no longer fails with "requires
+  numeric/complex matrix/vector arguments": it now projects onto the
+  horizontal basis stored in `U1` and computes `h` without smoothing, as
+  `jointFPCAh` does
+* `get_distance_matrix(scale = TRUE)` now compares the scaled curves; it
+  ignored the scaling and returned all-zero distances
+* `multivariate_karcher_mean` no longer fails with "object 'v' not found" when
+  it converges on its first iteration, and the returned `qn`, `gamma`, `R` and
+  `v` now all come from the same alignment step
+* `predict` for `multivariate_pca` fits no longer fails; curves are aligned
+  and mapped to the tangent space the same way `multivariate_karcher_mean`
+  does for the fitted curves
+* `v_to_curve` accepts a matrix of shooting vectors, one per column
+* `ppd` chooses lambda from the persistent peaks again: the peak clustering
+  always came back empty and the exact-match test never succeeded
+* the phase boxplot uses the full energy, including the angle term, to pick
+  the alpha quantiles, normalizes every shooting vector, and keeps the
+  quantile curves, their SRSFs and indices together when it swaps them
+* `bootTB` computes the phase tolerance bounds from the bootstrap samples
+  rather than from the original warping functions
+* `gauss_model(sort_samples = TRUE)` no longer fails with "the condition has
+  length > 1", and `gauss_model` stores `gams` with one warping function per
+  column, like `warping_functions`
+* `kmeans_align` no longer fails when a cluster holds a single curve, and no
+  longer swaps the curve and SRVF of multivariate medoid templates
+* `elastic_ph_change_ff` uses `d` Monte Carlo draws as documented,
+  `elastic_amp_change_ff` and `elastic_ph_change_ff` center the curve at the
+  changepoint with the "before" mean, and `elastic_change_fpca` no longer fails
+  when a single principal component is retained
+* `jointFPCA(srvf = FALSE)` chooses `C` by comparing its reconstructions with
+  the original functions rather than with their SRSFs
+* `reparam_curve(method = "DPo")` returns the optimal rotation instead of
+  `NULL`, and the `"DP"` method honours `mode`
+* `pair_align_image` reads the width of the second image correctly and takes
+  image gradients of non-square images without failing, using each axis's own
+  spacing
+* `curve_boxplot` no longer fails with "argument is of length zero" on
+  `multivariate_karcher_mean` results, and with `scale = FALSE` it measures
+  distances to the lower whisker from the lower whisker
+* image registration: the Jacobian of 3-dimensional maps uses all three
+  terms, the `"s"` basis uses the right frequency and axis, composing warps
+  without the **interp** package no longer returns zeros, and
+  `reparam_image` records the previous energy rather than an unset one when
+  it rejects a step
+* the `"SIMUL"` method of `optimum.reparam` interpolates correctly across
+  several flat segments, and `"DPo"` falls back to `"DP"` whenever the two
+  grids differ anywhere
+* `time_warping` now stops once the template changes by less than 1%, as the
+  Python and MATLAB implementations do, instead of as soon as the change
+  shrinks; `qun` now includes the last value computed
+* `align_fPCA` returns warping functions that match the aligned functions
+* `function_group_warp_bayes` now iterates the Karcher mean of the warping
+  functions instead of taking a single step
+* `sample_shapes` follows the whole geodesic for closed curves, supports
+  curves in more than two dimensions when `rotation = FALSE`, and keeps the
+  sign of sampled rotation angles
+* internal fixes: `warp_q_gamma` is defined once, fixing the regression
+  helpers that passed its arguments in the other order; duplicate definitions
+  of `gam_to_psi`, `psi_to_gam`, `l2_norm`, `inner_product` and `Enorm` were
+  removed; several unexported helpers (`calc_j`, `calculate_variance`,
+  `inverse_exp`, `curve_align_sub`, `karcher_calc`, `elastic.regression`,
+  `elastic.logistic`) were corrected; a memory leak in the multinomial
+  logistic warping code was fixed
+* `pair_align_image` and `reparam_image` work again, for square and
+  non-square images. With interp 1.1.6, whose `bicubic()` is an
+  irregular-grid workaround, warping failed with "length of y0 and x0
+  differs!" or returned `NA`s, and every warp other than the identity paired
+  the wrong row and column coordinates. Images and warps are now
+  interpolated with the package's own tensor-product cubic spline (as in the
+  C++ q-map code): the identity warp reproduces the image exactly, and warps
+  are no longer upsampled 8 times, so iterations take a fraction of a second
+  instead of minutes. `interp` and `fields` are no longer used.
+  `reparam_image` now also checks the updated warp, rather than the previous
+  one, for folding
+
 # fdasrvf 2.4.4
 * expose PNS functions 
 

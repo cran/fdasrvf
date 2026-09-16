@@ -68,6 +68,7 @@ export(gradient)
 export(h_to_gam)
 export(horizFPCA)
 export(horizFPNS)
+export(interparc)
 export(inv_exp_map)
 export(invertGamma)
 export(jointFPCA)
@@ -112,6 +113,8 @@ export(warp_srvf)
 importFrom(Rcpp,sourceCpp)
 importFrom(coda,effectiveSize)
 importFrom(foreach,"%dopar%")
-importFrom(graphics,boxplot)
-importFrom(graphics,plot)
+importFrom(graphics,
+  boxplot,
+  plot
+)
 useDynLib(fdasrvf, .registration = TRUE)

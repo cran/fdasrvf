@@ -15,9 +15,13 @@
 #' @param mu vector of size \eqn{N} that f is aligned to, Defaults to `NaN`
 #' @param penalty_method A string specifying the penalty term used in the
 #'   formulation of the cost function to minimize for alignment. Choices are
-#'   `"roughness"` which uses the norm of the second derivative, `"geodesic"`
-#'   which uses the geodesic distance to the identity and `"norm"` which uses
-#'   the Euclidean distance to the identity. Defaults to `"roughness"`.
+#'   `"roughness"` which uses the norm of the second derivative, `"l2gam"`
+#'   which uses the \eqn{L^2} distance of the warping function to the identity,
+#'   `"l2psi"` which uses the \eqn{L^2} distance of the SRVF of the warping
+#'   function to that of the identity, `"geodesic"` which uses the geodesic
+#'   distance to the identity, and `"none"` which applies no penalty. `"norm"`
+#'   is kept for backward compatibility as an alias for `"l2gam"`. Defaults to
+#'   `"roughness"`.
 #' @param centroid_type A string specifying the type of centroid to align to.
 #'   Choices are `"mean"` or `"median"`. Defaults to `"mean"`.
 #' @param center_warpings A boolean specifying whether to center the estimated
@@ -51,17 +55,18 @@ ppd <- function(f,
                 pt = 0.15,
                 srvf = FALSE,
                 mu = NaN,
-                penalty_method = c("roughness", "geodesic", "norm"),
+                penalty_method = c("roughness", "l2gam", "l2psi",
+                                   "geodesic", "none", "norm"),
                 centroid_type = c("mean", "median"),
                 center_warpings = TRUE,
                 smooth_data = FALSE,
                 sparam = 25L,
                 parallel = TRUE,
                 cores = -1,
-                optim_method = c("DP", "DPo", "DP2", "RBFGS"),
+                optim_method = c("DP", "DPo", "RBFGS"),
                 max_iter = 20L){
 
-  penalty_method <- rlang::arg_match(penalty_method)
+  penalty_method <- penalty_alias(rlang::arg_match(penalty_method))
   centroid_type <- rlang::arg_match(centroid_type)
   optim_method <- rlang::arg_match(optim_method)
 
@@ -124,7 +129,7 @@ ppd <- function(f,
     comp = !is.nan(obj$IndicatorMatrix[i,])
 
     # check for exact match
-    if (identical(comp, ref_row)){
+    if (all(comp == ref_row)){
       exact_match_indices = c(exact_match_indices, i)
     }
     # calculate Hamming distance
@@ -382,7 +387,7 @@ getPersistentPeaks <- function(IndicatorMatrix){
   # compute pairwise distances between observations
   pairwiseDistances <- stats::dist(data)
   hc <- stats::hclust(pairwiseDistances, method = "ward.D2")
-  clusterAssignments = hc$labels2
+  clusterAssignments = stats::cutree(hc, k = 2)
   referenceCluster = clusterAssignments[length(clusterAssignments)]
   clusterAssignments = clusterAssignments[-length(clusterAssignments)]
 

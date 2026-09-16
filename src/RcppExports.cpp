@@ -167,6 +167,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// interp_surf
+Rcpp::NumericVector interp_surf(Rcpp::NumericVector F, Rcpp::NumericVector u, Rcpp::NumericVector v, int m, int n, int d);
+RcppExport SEXP _fdasrvf_interp_surf(SEXP FSEXP, SEXP uSEXP, SEXP vSEXP, SEXP mSEXP, SEXP nSEXP, SEXP dSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type F(FSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type u(uSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type v(vSEXP);
+    Rcpp::traits::input_parameter< int >::type m(mSEXP);
+    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< int >::type d(dSEXP);
+    rcpp_result_gen = Rcpp::wrap(interp_surf(F, u, v, m, n, d));
+    return rcpp_result_gen;
+END_RCPP
+}
 // find_phistar
 Rcpp::NumericVector find_phistar(Rcpp::NumericVector w, Rcpp::NumericVector q, Rcpp::NumericVector b, int n, int t, int d, int K);
 RcppExport SEXP _fdasrvf_find_phistar(SEXP wSEXP, SEXP qSEXP, SEXP bSEXP, SEXP nSEXP, SEXP tSEXP, SEXP dSEXP, SEXP KSEXP) {
@@ -207,8 +223,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // DPQ2
-Rcpp::List DPQ2(Rcpp::NumericVector Q1, Rcpp::NumericVector T1, Rcpp::NumericVector Q2, Rcpp::NumericVector T2, int m1, int n1, int n2, Rcpp::NumericVector tv1, Rcpp::NumericVector tv2, int n1v, int n2v, double lam1, int nbhd_dim);
-RcppExport SEXP _fdasrvf_DPQ2(SEXP Q1SEXP, SEXP T1SEXP, SEXP Q2SEXP, SEXP T2SEXP, SEXP m1SEXP, SEXP n1SEXP, SEXP n2SEXP, SEXP tv1SEXP, SEXP tv2SEXP, SEXP n1vSEXP, SEXP n2vSEXP, SEXP lam1SEXP, SEXP nbhd_dimSEXP) {
+Rcpp::List DPQ2(Rcpp::NumericVector Q1, Rcpp::NumericVector T1, Rcpp::NumericVector Q2, Rcpp::NumericVector T2, int m1, int n1, int n2, Rcpp::NumericVector tv1, Rcpp::NumericVector tv2, int n1v, int n2v, double lam1, int nbhd_dim, int pen);
+RcppExport SEXP _fdasrvf_DPQ2(SEXP Q1SEXP, SEXP T1SEXP, SEXP Q2SEXP, SEXP T2SEXP, SEXP m1SEXP, SEXP n1SEXP, SEXP n2SEXP, SEXP tv1SEXP, SEXP tv2SEXP, SEXP n1vSEXP, SEXP n2vSEXP, SEXP lam1SEXP, SEXP nbhd_dimSEXP, SEXP penSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -225,7 +241,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type n2v(n2vSEXP);
     Rcpp::traits::input_parameter< double >::type lam1(lam1SEXP);
     Rcpp::traits::input_parameter< int >::type nbhd_dim(nbhd_dimSEXP);
-    rcpp_result_gen = Rcpp::wrap(DPQ2(Q1, T1, Q2, T2, m1, n1, n2, tv1, tv2, n1v, n2v, lam1, nbhd_dim));
+    Rcpp::traits::input_parameter< int >::type pen(penSEXP);
+    rcpp_result_gen = Rcpp::wrap(DPQ2(Q1, T1, Q2, T2, m1, n1, n2, tv1, tv2, n1v, n2v, lam1, nbhd_dim, pen));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -273,9 +290,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_fdasrvf_order_l2norm", (DL_FUNC) &_fdasrvf_order_l2norm, 2},
     {"_fdasrvf_find_grad_2D", (DL_FUNC) &_fdasrvf_find_grad_2D, 6},
     {"_fdasrvf_check_cross", (DL_FUNC) &_fdasrvf_check_cross, 4},
+    {"_fdasrvf_interp_surf", (DL_FUNC) &_fdasrvf_interp_surf, 6},
     {"_fdasrvf_find_phistar", (DL_FUNC) &_fdasrvf_find_phistar, 7},
     {"_fdasrvf_mlogit_warp_grad_wrap", (DL_FUNC) &_fdasrvf_mlogit_warp_grad_wrap, 12},
-    {"_fdasrvf_DPQ2", (DL_FUNC) &_fdasrvf_DPQ2, 13},
+    {"_fdasrvf_DPQ2", (DL_FUNC) &_fdasrvf_DPQ2, 14},
     {"_fdasrvf_DPQ", (DL_FUNC) &_fdasrvf_DPQ, 7},
     {"_fdasrvf_rlbfgs", (DL_FUNC) &_fdasrvf_rlbfgs, 6},
     {NULL, NULL, 0}

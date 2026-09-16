@@ -10,9 +10,14 @@
 #' @param lambda A numeric value specifying the elasticity. Defaults to `0.0`.
 #' @param penalty_method A string specifying the penalty term used in the
 #'   formulation of the cost function to minimize for alignment. Choices are
-#'   `"roughness"` which uses the norm of the second derivative, `"geodesic"`
-#'   which uses the geodesic distance to the identity and `"norm"` which uses
-#'   the Euclidean distance to the identity. Defaults to `"roughness"`.
+#'   `"roughness"` which uses the norm of the second derivative, `"l2gam"`
+#'   which uses the \eqn{L^2} distance of the warping function to the identity,
+#'   `"l2psi"` which uses the \eqn{L^2} distance of the SRVF of the warping
+#'   function to that of the identity, `"geodesic"` which uses the geodesic
+#'   distance to the identity, and `"none"` which applies no penalty. `"norm"`
+#'   is kept for backward compatibility as an alias for `"l2gam"`. The penalty
+#'   is weighted by `lambda`, so it has no effect when `lambda = 0`. Defaults
+#'   to `"roughness"`.
 #' @param centroid_type A string specifying the type of centroid to align to.
 #'   Choices are `"mean"` or `"median"`. Defaults to `"mean"`.
 #' @param center_warpings A boolean specifying whether to center the estimated
@@ -76,16 +81,17 @@
 time_warping <- function(f,
                          time,
                          lambda = 0.0,
-                         penalty_method = c("roughness", "geodesic", "norm"),
+                         penalty_method = c("roughness", "l2gam", "l2psi",
+                                            "geodesic", "none", "norm"),
                          centroid_type = c("mean", "median"),
                          center_warpings = TRUE,
                          smooth_data = FALSE,
                          sparam = 25L,
                          parallel = FALSE,
                          cores = -1,
-                         optim_method = c("DP", "DPo", "DP2", "RBFGS"),
+                         optim_method = c("DP", "DPo", "RBFGS"),
                          max_iter = 20L) {
-  penalty_method <- rlang::arg_match(penalty_method)
+  penalty_method <- penalty_alias(rlang::arg_match(penalty_method))
   centroid_type <- rlang::arg_match(centroid_type)
   optim_method <- rlang::arg_match(optim_method)
 
@@ -262,7 +268,9 @@ time_warping <- function(f,
     if (qun[r + 1] < .Machine$double.eps)
       qun[r + 1] <- 0
 
-    if (qun[r + 1] - qun[r] <= 1.0e-4 * qun[r])
+    # stop once the relative change in the template is below 1%, as the
+    # Python and MATLAB implementations do
+    if (qun[r + 1] < 1e-2)
       break
   }
 
@@ -367,7 +375,7 @@ time_warping <- function(f,
     original_variance = orig_var,
     amplitude_variance = amp_var,
     phase_variance = phase_var,
-    qun = qun[1:r],
+    qun = qun[1:(r + 1)],
     inverse_average_warping_function = gamI,
     rsamps = FALSE,
     call = list(
