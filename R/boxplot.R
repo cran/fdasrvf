@@ -120,12 +120,15 @@ boxplot.ampbox <- function(x, ...) {
     Fs2[, 396 + j] <- (1 - s[j]) * Q3 + s[j] * Q3a
     Fs2[, 495 + j] <- (1 - s[j]) * Q3a + s[j] * maxx
   }
-  d1 <- sqrt(trapz(time, (x$qmedian - x$Q1_q) ^ 2))
-  d1a <- sqrt(trapz(time, (x$Q1_q - x$Q1a_q) ^ 2))
-  dl <- sqrt(trapz(time, (x$Q1a_q - x$min_q) ^ 2))
-  d3 <- sqrt(trapz(time, (x$qmedian - x$Q3_q) ^ 2))
-  d3a <- sqrt(trapz(time, (x$Q3_q - x$Q3a_q) ^ 2))
-  du <- sqrt(trapz(time, (x$Q3a_q - x$max_q) ^ 2))
+  # place each curve at its distance from the median; the increments
+  # between neighbouring curves then sum to that distance (pairwise
+  # distances like d(Q1,Q1a) would overshoot by the triangle inequality)
+  d1 <- x$dist[x$Q1_index]
+  d1a <- x$dist[x$Q1a_index] - d1
+  dl <- x$dist[x$min_index] - d1 - d1a
+  d3 <- x$dist[x$Q3_index]
+  d3a <- x$dist[x$Q3a_index] - d3
+  du <- x$dist[x$max_index] - d3 - d3a
   part1 <- seq(-d1 - d1a - dl, -d1 - d1a, length.out = 100)
   part2 <- seq(-d1 - d1a, -d1, length.out = 100)
   part3 <- seq(-d1, 0, length.out = 100)
@@ -255,6 +258,11 @@ boxplot.ampbox <- function(x, ...) {
 #' - `maxx`: maximum extreme function
 #' - `outlier_index`: indexes of outlier functions
 #' - `fmedian`: median function
+#' - `alpha`, `ka`: the quantile level and whisker scale used
+#' - `r50`, `ralpha`: distances bounding the 50% and \eqn{(1-\alpha)} central
+#'   regions
+#' - `whisker_dis`: whisker (outlier cutoff) distance
+#' - `template`: what [classify()] needs to align new functions to the template
 #'
 #' @keywords srvf alignment boxplot
 #'
@@ -291,6 +299,7 @@ ampbox_data <- function(warp_median, alpha = 0.05, ka = 1) {
   dy_ordering <- sort(dy, index.return = TRUE)$ix
   CR_50 <- dy_ordering[1:round(N / 2)]  # 50% central region
   m <- max(dy[CR_50])  # maximal amplitude distance with 50% central region
+  r50 <- m
 
   # identify amplitude quartiles
   angle <- matrix(0, nrow = length(CR_50), ncol = length(CR_50))
@@ -321,6 +330,7 @@ ampbox_data <- function(warp_median, alpha = 0.05, ka = 1) {
   dy_ordering <- sort(dy, index.return = TRUE)$ix
   CR_alpha <- dy_ordering[1:round(N * (1 - alpha))]  # (1-alpha)% central region
   m <- max(dy[CR_alpha])  # maximal amplitude distance with (1-alpha)% central region
+  ralpha <- m
   angle <- matrix(0, nrow = length(CR_alpha), ncol = length(CR_alpha))
   energy <- matrix(0, nrow = length(CR_alpha), ncol = length(CR_alpha))
 
@@ -340,6 +350,14 @@ ampbox_data <- function(warp_median, alpha = 0.05, ka = 1) {
 
   Q1a_index <- CR_alpha[maxloc[1, 1]]
   Q3a_index <- CR_alpha[maxloc[1, 2]]
+
+  # check quartile and quantile going same direction
+  tst <- trapz(time, (qn[, Q1a_index] - qmedian) * (qn[, Q1_index] - qmedian))
+  if (tst < 0) {
+    tmp_index <- Q1a_index
+    Q1a_index <- Q3a_index
+    Q3a_index <- tmp_index
+  }
   Q1a_q <- qn[, Q1a_index]
   Q3a_q <- qn[, Q3a_index]
   Q1a <- fn[, Q1a_index]
@@ -351,8 +369,8 @@ ampbox_data <- function(warp_median, alpha = 0.05, ka = 1) {
   v3 <- Q3_q - qmedian
   upper_q <- Q3_q + ka * IQR * v3 / sqrt(trapz(time, v3 * v3))
   lower_q <- Q1_q + ka * IQR * v1 / sqrt(trapz(time, v1 * v1))
-  upper <- cumtrapz(time, upper_q * abs(upper_q))
-  lower <- cumtrapz(time, lower_q * abs(lower_q))
+  upper <- spline_cumintegral(time, upper_q * abs(upper_q))
+  lower <- spline_cumintegral(time, lower_q * abs(lower_q))
 
   upper_dis <- sqrt(trapz(time, (upper_q - qmedian)^2))
   lower_dis <- sqrt(trapz(time, (lower_q - qmedian)^2))
@@ -409,6 +427,14 @@ ampbox_data <- function(warp_median, alpha = 0.05, ka = 1) {
   out$Q1_index <- Q1_index
   out$Q3a_index <- Q3a_index
   out$Q3_index <- Q3_index
+  out$min_index <- min_index
+  out$max_index <- max_index
+  out$alpha <- alpha
+  out$ka <- ka
+  out$r50 <- r50
+  out$ralpha <- ralpha
+  out$whisker_dis <- whisker_dis
+  out$template <- warp_template(warp_median)
 
   class(out) <- 'ampbox'
 
@@ -454,12 +480,15 @@ boxplot.phbox <- function(x, ...) {
     Fs2[, 396 + j] <- (1 - s[j]) * (Q3 - time) + s[j] * (Q3a - time)
     Fs2[, 495 + j] <- (1 - s[j]) * (Q3a - time) + s[j] * (maxx - time)
   }
-  d1 <- acos(inner_product(x$psi_median, x$Q1_psi))
-  d1a <- acos(inner_product(x$Q1_psi, x$Q1a_psi))
-  dl <- acos(inner_product(x$Q1a_psi, x$min_psi))
-  d3 <- acos(inner_product(x$psi_median, x$Q3_psi))
-  d3a <- acos(inner_product(x$Q3_psi, x$Q3a_psi))
-  du <- acos(inner_product(x$Q3a_psi, x$max_psi))
+  # place each curve at its distance from the median; the increments
+  # between neighbouring curves then sum to that distance (pairwise
+  # distances like d(Q1,Q1a) would overshoot by the triangle inequality)
+  d1 <- x$dist[x$Q1_index]
+  d1a <- x$dist[x$Q1a_index] - d1
+  dl <- x$dist[x$min_index] - d1 - d1a
+  d3 <- x$dist[x$Q3_index]
+  d3a <- x$dist[x$Q3a_index] - d3
+  du <- x$dist[x$max_index] - d3 - d3a
   part1 <- seq(-d1 - d1a - dl, -d1 - d1a, length.out = 100)
   part2 <- seq(-d1 - d1a, -d1, length.out = 100)
   part3 <- seq(-d1, 0, length.out = 100)
@@ -588,6 +617,11 @@ boxplot.phbox <- function(x, ...) {
 #' - `minn`: minimum extreme function
 #' - `maxx`: maximum extreme function
 #' - `outlier_index`: indexes of outlier functions
+#' - `alpha`, `kp`: the quantile level and whisker scale used
+#' - `r50`, `ralpha`: distances bounding the 50% and \eqn{(1-\alpha)} central
+#'   regions
+#' - `whisker_dis`: whisker (outlier cutoff) distance
+#' - `template`: what [classify()] needs to align new functions to the template
 #'
 #' @keywords srvf alignment boxplot
 #'
@@ -617,13 +651,14 @@ phbox_data <- function(warp_median, alpha = .05, kp = 1) {
   binsize <- mean(diff(time))
   dx <- rep(0, N)
   for (i in 1:N) {
-    psi[, i] <- sqrt(gradient(gam[, i], binsize))
+    psi[, i] <- sqrt(pmax(gradient(gam[, i], binsize), 0))
     v[, i] <- inv_exp_map(psi_median, psi[, i])
     dx[i] <- sqrt(trapz(time, v[, i] ^ 2))
   }
   dx_ordering <- sort(dx, index.return = TRUE)$ix
   CR_50 <- dx_ordering[1:round(N / 2)]  # 50% central region
   m <- max(dx[CR_50])  # maximal phase distance with 50% central region
+  r50 <- m
 
   # identify phase quartiles
   angle <- matrix(0, length(CR_50), length(CR_50))
@@ -649,13 +684,14 @@ phbox_data <- function(warp_median, alpha = .05, kp = 1) {
   Q3_index <- CR_50[maxloc[1, 2]]
   Q1 <- gam[, Q1_index]
   Q3 <- gam[, Q3_index]
-  Q1_psi <- sqrt(gradient(Q1, 1 / (M - 1)))
-  Q3_psi <- sqrt(gradient(Q3, 1 / (M - 1)))
+  Q1_psi <- sqrt(pmax(gradient(Q1, 1 / (M - 1)), 0))
+  Q3_psi <- sqrt(pmax(gradient(Q3, 1 / (M - 1)), 0))
 
   # identify phase quantiles
   dx_ordering <- sort(dx, index.return = TRUE)$ix
   CR_alpha <- dx_ordering[1:round(N * (1 - alpha))]  # (1-alpha)% central region
   m <- max(dx[CR_alpha])  # maximal phase distance with (1-alpha)% central region
+  ralpha <- m
   angle <- matrix(0, length(CR_alpha), length(CR_alpha))
   energy <- matrix(0, length(CR_alpha), length(CR_alpha))
   for (i in 1:(length(CR_alpha) - 1)) {
@@ -688,8 +724,8 @@ phbox_data <- function(warp_median, alpha = .05, kp = 1) {
   }
   Q1a <- gam[, Q1a_index]
   Q3a <- gam[, Q3a_index]
-  Q1a_psi <- sqrt(gradient(Q1a, 1 / (M - 1)))
-  Q3a_psi <- sqrt(gradient(Q3a, 1 / (M - 1)))
+  Q1a_psi <- sqrt(pmax(gradient(Q1a, 1 / (M - 1)), 0))
+  Q3a_psi <- sqrt(pmax(gradient(Q3a, 1 / (M - 1)), 0))
 
   # compute phase whiskers
   IQR <- dx[Q1_index] + dx[Q3_index]
@@ -754,6 +790,14 @@ phbox_data <- function(warp_median, alpha = .05, kp = 1) {
   out$Q1_index <- Q1_index
   out$Q3a_index <- Q3a_index
   out$Q3_index <- Q3_index
+  out$min_index <- min_index
+  out$max_index <- max_index
+  out$alpha <- alpha
+  out$kp <- kp
+  out$r50 <- r50
+  out$ralpha <- ralpha
+  out$whisker_dis <- whisker_dis
+  out$template <- warp_template(warp_median)
 
   class(out) <- 'phbox'
 
