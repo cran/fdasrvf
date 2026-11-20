@@ -29,10 +29,12 @@
 #'   the 2nd function at \eqn{t = t_{\min}}. Defaults to `rep(0, n_dimensions)`.
 #' @param nbhd_dim size of the grid for `"DP"` (default = 10, the 63 slopes
 #'   `"DPo"` searches)
-#' @param scl for `"DPo"`, the SRVFs are resampled `scl` times finer to
-#'   evaluate the alignment cost; the warp stays on the grid `T1` (default = 3,
-#'   1 turns the resampling off). `"DP"` integrates the linearly interpolated
-#'   SRVFs exactly, so it does not use `scl`.
+#' @param scl for `"DPo"` and `"RBFGS"`, the SRVFs are resampled `scl` times
+#'   finer to evaluate the alignment cost; the warp stays on the grid `T1`
+#'   (default = 3, 1 turns the resampling off). `"DP"` integrates the linearly
+#'   interpolated SRVFs exactly, so it does not use `scl`. `"RBFGS"` starts
+#'   from a `"DP"` warp on a coarse grid of at most 51 points (using
+#'   `nbhd_dim`) and refines it.
 #'
 #' @return A numeric vector of size `n_points` storing discrete evaluations of
 #'   the estimated boundary-preserving warping diffeomorphism on the initial
@@ -116,9 +118,51 @@ optimum.reparam <- function(Q1,T1,Q2,T2,
       gam0 <- simul_gam(u, out$g1, out$g2, timet2, out$s1, out$s2, timet2)
     },
     RBFGS = {
-      time1 <- seq(0, 1, length.out=length(Q1))
-      gam0 <- rlbfgs(Q1, Q2, time1, 30, lambda_rbfgs, pen_rbfgs)
-      gam0 <- c(gam0)
+      # As in Huang et al., "Riemannian optimization for registration of
+      # curves in elastic shape analysis": RBFGS descends from where it
+      # starts, so start it from a DP warp on a coarse grid of at most 51
+      # points, which is cheap, and refine it on Q1 and Q2 resampled linearly
+      # scl times finer. On time1 itself the trapezoid rule samples Q2 only at
+      # the warped grid points, so where the warp is steep the solver could
+      # skip features of Q2 and lower its cost without aligning them
+      time1 <- seq(0, 1, length.out = M)
+      nc <- min(M, 51)
+      tc <- seq(0, 1, length.out = nc)
+      Q1c <- stats::spline(time1, c(Q1), xout = tc)$y
+      Q2c <- stats::spline(time1, c(Q2), xout = tc)$y
+      ret <- DPQ2(Q1c, tc, Q2c, tc, 1, nc, nc, tc, tc, nc, nc, lambda,
+                  nbhd_dim, pen_dp)
+      G <- ret$G[1:ret$size]
+      Tf <- ret$T[1:ret$size]
+      tf <- seq(0, 1, length.out = (M - 1) * scl + 1)
+      # start from the exact identity rather than its interpolation
+      gamc <- if (identical(G, Tf))
+        NULL
+      else
+        stats::approx(Tf, G, xout = tf)$y
+      # lambda is divided by scl to weigh the penalty as it would on time1
+      Q1f <- stats::approx(time1, c(Q1), xout = tf)$y
+      Q2f <- stats::approx(time1, c(Q2), xout = tf)$y
+      lamf <- lambda_rbfgs / scl
+      out <- rlbfgs(Q1f, Q2f, tf, 30, lamf, pen_rbfgs, gamc)
+      # the DP warp is piecewise linear, which the penalty can make costly to
+      # start from, so with a penalty also start from the identity and keep
+      # the warp of lower cost
+      if (lamf > 0) {
+        outi <- rlbfgs(Q1f, Q2f, tf, 30, lamf, pen_rbfgs)
+        if (outi$info[3] < out$info[3])
+          out <- outi
+      }
+      # every scl-th point of tf is a point of time1
+      gam0 <- c(out$gam)[seq(1, length(tf), by = scl)]
+      # a warp that only pays off on the finer grid can fit worse on time1,
+      # so without a penalty keep the DP start when it fits better there
+      if (lamf == 0) {
+        gamd <- stats::approx(Tf, G, xout = time1)$y
+        fit <- function(gam) sum((c(Q1) - warp_q_gamma(c(Q2), time1, gam))^2)
+        if (fit(gamd) < fit(gam0))
+          gam0 <- gamd
+      }
     }
   )
 

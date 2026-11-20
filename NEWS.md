@@ -1,3 +1,117 @@
+# fdasrvf 2.6.0
+
+* ported from MATLAB fdasrvf 3.7.X: new elastic functional statistical
+  process control (Tucker, 2016). `fdaspc()` fits PCA-based monitoring models
+  to `time_warping()` output, one for amplitude (vertical fPCA) and one for
+  phase (horizontal fPCA on the shooting vectors), with the Hotelling T^2
+  limit (`t2limit = "standard"` or `"book"`) and the SPE limit of the Box
+  chi-square approximation (Ge and Song, 2013, Eqs. 2.3-2.8). By default the
+  limits are fit to the training functions re-aligned with `align_new()`, the
+  same path used for new data. `spc_monitor()` aligns new functions to the
+  template and returns their scores, T^2, SPE, alarms and per-time-point
+  contributions; `plot.fdaspc()` draws the control charts and
+  `plot_contrib()` the contributions of one monitored function
+
+* ported from MATLAB fdasrvf 3.7.X: new `dpmeans_align()`, elastic DP-means
+  clustering and alignment of functions (Kulis and Jordan, 2012). A function
+  farther than `lambda` from every template opens a new cluster that later
+  functions in the same pass can join, so the number of clusters is learned
+  from the data. Each pass normalizes the warps within each cluster and
+  updates the templates as Karcher means of the aligned SRVFs; empty clusters
+  are dropped. The objective is the sum of squared elastic distances plus
+  `lambda^2` times the number of clusters, with a relative stopping rule. The
+  alignment penalty (`lambda_align`) is separate from the cluster penalty,
+  and `lambda = NA` (the default) picks it from a k-means++ seeding
+* ported from MATLAB fdasrvf 3.7.X: new `plot_mcmc()` for the Bayesian
+  alignments (`time_warping_bayes()` and `time_warping_bayes_infHMC()`):
+  traces of sigma and the log-likelihood with the burn-in marked, the
+  posterior and autocorrelation (with effective sample size) of sigma, the
+  running acceptance rate, proposals and acceptance by pCN step (pCN) or the
+  HMC step size of each function (infHMC), traces of each function's warping
+  coefficient norm, the posterior template with a 95% credible band and the
+  posterior warping functions with 95% credible bands. `plot.fdawarp()` calls
+  it when the `mcmc` component is filled in; `mcmc` now also stores `burnin`
+  and `iter` (and for pCN `logl`, `extrainfo` and `zpcn`)
+* `kmeans_align()` (ported from MATLAB fdasrvf 3.7.X): smooths the data before
+  taking the initial templates, returns the inverse Karcher mean warp of each
+  cluster as `gamI`, and builds the univariate mean templates in function
+  space from the SRVF templates so the two stay consistent
+* `plot.fdakma()` now accepts the 1 x M x K template arrays returned by
+  `kmeans_align()` and `dpmeans_align()`
+
+* ported from MATLAB fdasrvf 3.7.X (PR #33): new `pair_align_functions_infHMC()`,
+  pairwise Bayesian alignment with infinite-dimensional Hamiltonian Monte Carlo
+  (Tucker, Shand and Chowdhary, 2021), which samples the warping coefficients
+  with the preconditioned HMC of Beskos et al. (2011) using an exact
+  likelihood gradient, draws the latent functions from Gaussian process
+  priors, and draws the SRVF model variance, the measurement error variances
+  and the Gaussian process variances and length scales. Warps use either the
+  shooting vector (`warp_rep = "shooting"`, `|v| < pi` enforced) or the
+  centered log-derivative (`warp_rep = "clr"`, the h-transform). The first
+  chain starts at the elastic (DP) alignment of the smoothed functions
+  (`init = "dp"`) and step sizes are adapted by dual averaging during burn-in
+  (Hoffman and Gelman, 2014). On `simu_data` it accepts about 0.7 of the warp
+  proposals and its posterior-mean warp is within 0.04 of DP's, in under a
+  second for 1000 iterations
+* ported from MATLAB fdasrvf 3.7.X (PR #33): new `time_warping_bayes_infHMC()`,
+  Bayesian group-wise alignment with per-curve infinite-dimensional HMC on the
+  warping coefficients (all curves updated in one batched step), conjugate
+  Gibbs draws of the B-spline template and the noise variance, initialization
+  from the elastic (DP) Karcher mean, and the centering constraint (Karcher
+  mean of warps = identity) imposed every `ncenter` iterations. It returns an
+  `fdawarp` object with an extra `mcmc` component. On `simu_data` its
+  posterior-mean warps are within 0.002 (mean absolute) of DP's
+* ported from MATLAB fdasrvf 3.7.X: new `time_warping_bayes()`, Bayesian
+  group-wise alignment with the Z-mixture pCN algorithm (Lu, Herbei and
+  Kurtek, 2017), the group counterpart of `pair_align_functions_expomap()`.
+  It returns an `fdawarp` object with an extra `mcmc` component
+* new internal helpers shared by the Bayesian HMC samplers: `bayes_warp_geom()`
+  (negative log-likelihood and exact gradient of a warp in SRVF space, with
+  the compiled kernel `bayes_warp_geom_c()`), `bayes_warp_basis()`,
+  `bayes_coef_to_gam()`, `bayes_gam_to_coef()`, `infhmc_step()`,
+  `infhmc_step_batch()`, `dual_avg_step()` and `create_basismatrix()`
+
+* ported from MATLAB fdasrvf 3.7.X: `optimum.reparam(method = "RBFGS")` is now
+  as accurate as `"DP"`: on random function pairs its median amplitude
+  distance is 0.94-0.99x `"DP"`'s and at most 1.05x (it stopped in local
+  minima, up to 3x), at about `"DP"`'s run time for 101 points and 3x and 9x
+  less for 201 and 401 points. It starts from a `"DP"` warp on a coarse grid
+  of at most 101 points and refines it on the SRVFs resampled `scl` times
+  finer (`scl` now applies to `"RBFGS"` as well as `"DPo"`); with
+  `lambda > 0` it also starts from the identity and keeps the lower cost, and
+  with `lambda = 0` it keeps the `"DP"` start when the refined warp fits worse
+  on the original grid. MATLAB's coarse grid of 51 points and keeping the
+  refined warp left the worst pairs at up to 1.2x `"DP"`'s distance. In the RBFGS solver the SRVFs
+  are scaled to unit L2 rather than Euclidean norm, so the gradient-norm
+  stopping test no longer loosens with the grid size (`lam` is rescaled so it
+  weighs the penalty as before), and `q2` is warped from the original by the
+  accumulated warping each step, so interpolation error no longer accumulates.
+  The internal `rlbfgs()` takes an optional starting warp `gam0` and returns
+  a list with the warp `gam` and `info` = (iterations, stop reason, cost,
+  gradient norm)
+* ported from MATLAB fdasrvf 3.7.X: the RBFGS solver now follows Huang,
+  Gallivan, Srivastava and Absil, "Riemannian optimization for registration
+  of curves in elastic shape analysis", for the warping alone (no rotation or
+  shift). It optimizes l = sqrt(gamma') on the unit sphere of L2[0,1] with
+  limited-memory RBFGS, taking steps along the exponential map and moving the
+  stored BFGS pairs by parallel translation. The cost is
+  ||q1 - q2(gamma) l||^2 plus the penalty plus the paper's barrier
+  B(l) = int (l^2 + 1/l^2) sqrt(1 + l^4), weighted by 1/100 and cut by 0.8
+  each iteration; `q2` is a natural cubic spline and the gradient
+  differentiates the discretised cost exactly (the old continuum gradient was
+  not a descent direction at warps with kinks, so the solver stalled). It
+  stops when the relative change of the cost stays below 1e-3 for more than
+  5 iterations after at least 10 (new stop reason 4 in `rlbfgs()`'s `info`).
+  `optimum.reparam(method = "RBFGS")` now refines the coarse `"DP"` warp on
+  SRVFs resampled linearly rather than by a spline, starting, as MATLAB and
+  the paper do, from a `"DP"` warp on a coarse grid of at most 51 points
+  (was 101). On `"DP"`'s own objective its median cost is 0.98x `"DP"`'s on
+  random function pairs and 0.86x on consecutive `growth_vel` pairs, at about
+  0.5x `"DP"`'s run time for 101 points and 0.16x for 201. From the coarse
+  start it can land in a different minimum: up to 1.4x `"DP"`'s cost on
+  random three-bump pairs (a 101 point start kept that to 1.03x at 2.3x the
+  run time)
+
 # fdasrvf 2.5.1
 * ported from MATLAB fdasrvf 3.7.X: new `classify()` for `ampbox` and `phbox`
   objects aligns new functions to the fitted template (new `align_new()` for

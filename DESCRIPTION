@@ -1,7 +1,7 @@
 Package: fdasrvf
 Type: Package
 Title: Elastic Functional Data Analysis
-Version: 2.5.1
+Version: 2.6.0
 Date: 2026-10-29
 Authors@R: c(
     person(given = "J. Derek", 
@@ -22,7 +22,8 @@ Description: Performs alignment, PCA, and modeling of multidimensional and
 License: GPL-3
 LazyData: TRUE
 Imports: cli, coda, doParallel, foreach, lpSolve, mgcv, Matrix,
-        mvtnorm, Rcpp, rlang, minpack.lm, tolerance, viridisLite
+        mvtnorm, Rcpp, rlang, splines, minpack.lm, tolerance,
+        viridisLite
 Suggests: covr, plot3D, plot3Drgl, rgl, testthat (>= 3.0.0), withr
 Depends: R (>= 4.3.0),
 Encoding: UTF-8
@@ -32,10 +33,10 @@ URL: https://github.com/jdtuck/fdasrvf_R
 BugReports: https://github.com/jdtuck/fdasrvf_R/issues
 Config/roxygen2/version: 8.1.1
 NeedsCompilation: yes
-Packaged: 2026-10-29 02:46:55 UTC; jdtuck
+Packaged: 2026-11-20 22:07:55 UTC; jdtuck
 Author: J. Derek Tucker [aut, cre] (ORCID:
     <https://orcid.org/0000-0001-8844-2169>),
   Aymeric Stamm [ctb] (ORCID: <https://orcid.org/0000-0002-8725-3654>)
 Maintainer: J. Derek Tucker <jdtuck@sandia.gov>
 Repository: CRAN
-Date/Publication: 2026-10-29 04:10:24 UTC
+Date/Publication: 2026-11-20 23:00:02 UTC
